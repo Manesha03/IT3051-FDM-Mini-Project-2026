@@ -1,6 +1,8 @@
 metric,value
 Dataset file,hotel_booking.csv
 Dataset status,Validated lecturer-approved raw dataset
+Original source,"Hotel Booking Demand Datasets by Antonio, de Almeida, and Nunes (2019)"
+Period covered,Scheduled arrivals from 1 July 2015 to 31 August 2017
 Problem type,Binary classification
 Prediction objective,Predict whether a hotel booking will be canceled
 Target variable,is_canceled

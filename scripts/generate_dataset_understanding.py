@@ -62,9 +62,45 @@ ATTRIBUTE_DESCRIPTIONS = {
 }
 
 POTENTIAL_LEAKAGE = {
-    "reservation_status": "Directly represents the final booking outcome.",
-    "reservation_status_date": "May be known only after cancellation/check-out status is confirmed.",
-    "assigned_room_type": "May be assigned after operational processing and should be reviewed before modeling.",
+    "reservation_status": "Confirmed leakage risk because it directly represents the final booking outcome.",
+    "reservation_status_date": "Confirmed leakage risk because it may be known only after cancellation/check-out status is confirmed.",
+    "assigned_room_type": "Not confirmed leakage, but a possible post-booking operational attribute that requires investigation before modeling.",
+}
+
+ATTRIBUTE_NOTES = {
+    "hotel": "Useful categorical predictor; should be encoded during preprocessing.",
+    "is_canceled": "Prediction target; must not be used as an input feature.",
+    "lead_time": "Important booking-timing predictor; check for high/extreme values during EDA.",
+    "arrival_date_year": "Date component; useful for period coverage and possible time-based patterns.",
+    "arrival_date_month": "Date component; useful for seasonality analysis and should be encoded carefully.",
+    "arrival_date_week_number": "Date component; useful for weekly arrival patterns.",
+    "arrival_date_day_of_month": "Date component; useful for arrival-day pattern checks.",
+    "stays_in_weekend_nights": "Stay-length feature; check zero-night and extreme-stay records.",
+    "stays_in_week_nights": "Stay-length feature; check zero-night and extreme-stay records.",
+    "adults": "Guest-count feature; check records with zero total guests.",
+    "children": "Guest-count feature; contains a small number of missing values.",
+    "babies": "Guest-count feature; check rare or unusual high values during EDA.",
+    "meal": "Categorical predictor; Undefined/SC categories should be reviewed before encoding.",
+    "country": "Categorical predictor with many unique values and some missing values.",
+    "market_segment": "Categorical predictor; Undefined values require investigation.",
+    "distribution_channel": "Categorical predictor; Undefined values require investigation.",
+    "is_repeated_guest": "Binary predictor that may indicate guest history.",
+    "previous_cancellations": "Customer-history feature; likely relevant to cancellation behavior.",
+    "previous_bookings_not_canceled": "Customer-history feature; likely relevant to repeat guest behavior.",
+    "reserved_room_type": "Original room type selected at booking time; should be encoded during preprocessing.",
+    "booking_changes": "May reflect customer/booking changes before final outcome; timing should be understood before modeling.",
+    "deposit_type": "Categorical predictor that may be strongly related to cancellation behavior.",
+    "agent": "Identifier-like categorical field with missing values; missing may mean no agent.",
+    "company": "Identifier-like categorical field with many missing values; missing may mean no company association.",
+    "days_in_waiting_list": "Operational feature; check skewness and high values during EDA.",
+    "customer_type": "Categorical predictor describing booking/customer contract type.",
+    "adr": "Numerical price-related feature; check negative and extreme values.",
+    "required_car_parking_spaces": "Guest request feature; may indicate stronger booking intention.",
+    "total_of_special_requests": "Guest request feature; may indicate stronger booking intention.",
+    "name": "PII/identifier field; should not be used as a predictive feature.",
+    "email": "PII/identifier field; should not be used as a predictive feature.",
+    "phone-number": "PII/identifier field; should not be used as a predictive feature.",
+    "credit_card": "Masked PII/identifier field; should not be used as a predictive feature.",
 }
 
 
@@ -84,7 +120,7 @@ def make_data_dictionary(df: pd.DataFrame) -> pd.DataFrame:
                 "missing_percentage": round(float(missing[column] / len(df) * 100), 3),
                 "unique_values": int(df[column].nunique(dropna=True)),
                 "example_values": "; ".join(examples),
-                "notes": POTENTIAL_LEAKAGE.get(column, ""),
+                "notes": POTENTIAL_LEAKAGE.get(column, ATTRIBUTE_NOTES.get(column, "")),
             }
         )
     return pd.DataFrame(rows)
@@ -102,6 +138,8 @@ def make_characteristics(df: pd.DataFrame, data_dictionary: pd.DataFrame) -> pd.
         [
             {"metric": "Dataset file", "value": "hotel_booking.csv"},
             {"metric": "Dataset status", "value": "Validated lecturer-approved raw dataset"},
+            {"metric": "Original source", "value": "Hotel Booking Demand Datasets by Antonio, de Almeida, and Nunes (2019)"},
+            {"metric": "Period covered", "value": "Scheduled arrivals from 1 July 2015 to 31 August 2017"},
             {"metric": "Problem type", "value": "Binary classification"},
             {"metric": "Prediction objective", "value": "Predict whether a hotel booking will be canceled"},
             {"metric": "Target variable", "value": "is_canceled"},
@@ -162,7 +200,15 @@ def build_notebook() -> dict:
             "pd.set_option('display.max_columns', None)\n"
             "pd.set_option('display.max_rows', 120)"
         ),
-        markdown_cell("## 4. Load the Approved Raw Dataset\n\nThe approved raw dataset is stored in the project folder under `data/raw/hotel_booking.csv`. The raw dataset is loaded without preprocessing or transformation."),
+        markdown_cell(
+            "## 4. Load the Approved Raw Dataset\n\n"
+            "The approved raw dataset is stored in the project folder under `data/raw/hotel_booking.csv`. The raw dataset is loaded without preprocessing or transformation.\n\n"
+            "**Original source:** Hotel Booking Demand Datasets by Antonio, de Almeida, and Nunes (2019).\n\n"
+            "**Citation:** Antonio, N., de Almeida, A., & Nunes, L. (2019). Hotel booking demand datasets. Data in Brief, 22, 41-49. https://doi.org/10.1016/j.dib.2018.11.126\n\n"
+            "**Original URL:** https://www.sciencedirect.com/science/article/pii/S2352340918315191\n\n"
+            "**Access mirror:** https://www.kaggle.com/datasets/mojtaba142/hotel-booking\n\n"
+            "**Period covered:** Scheduled arrivals from 1 July 2015 to 31 August 2017."
+        ),
         code_cell(
             "DATA_PATH = Path('../data/raw/hotel_booking.csv')\n"
             "df = pd.read_csv(DATA_PATH)\n"
@@ -260,12 +306,12 @@ def build_notebook() -> dict:
         ),
         markdown_cell("## 16. Initial Class Distribution\n\nThe target-variable distribution shows whether the cancellation classes are balanced or imbalanced. This is useful for later modeling decisions, but no modeling is performed in this stage."),
         code_cell("target_distribution"),
-        markdown_cell("## 17. Potential Data Leakage\n\nPotential leakage variables are attributes that may reveal the booking outcome directly or may only be known after the cancellation decision has already happened. These variables should be carefully reviewed before future modeling."),
+        markdown_cell("## 17. Potential Data Leakage\n\nPotential leakage variables are attributes that may reveal the booking outcome directly or may only be known after the cancellation decision has already happened. In this dataset, `reservation_status` and `reservation_status_date` are treated as clear leakage risks because they describe the final reservation outcome or the timing of that outcome. `assigned_room_type` is not treated as confirmed leakage at this stage, but it is flagged for further investigation because it may be assigned after booking operations and may not always be available at prediction time."),
         code_cell(
             "potential_leakage = pd.DataFrame([\n"
-            "    {'attribute': 'reservation_status', 'reason': 'Directly represents the final booking outcome.'},\n"
-            "    {'attribute': 'reservation_status_date', 'reason': 'May be known only after cancellation/check-out status is confirmed.'},\n"
-            "    {'attribute': 'assigned_room_type', 'reason': 'May be assigned after operational processing and should be reviewed before modeling.'},\n"
+            "    {'attribute': 'reservation_status', 'leakage_status': 'Clear leakage risk', 'reason': 'Directly represents the final booking outcome.'},\n"
+            "    {'attribute': 'reservation_status_date', 'leakage_status': 'Clear leakage risk', 'reason': 'May be known only after cancellation/check-out status is confirmed.'},\n"
+            "    {'attribute': 'assigned_room_type', 'leakage_status': 'Requires investigation', 'reason': 'Not confirmed leakage, but may be a post-booking operational attribute depending on when room assignment occurs.'},\n"
             "])\n"
             "potential_leakage"
         ),
