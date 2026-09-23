@@ -8,7 +8,7 @@ import pandas as pd
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE_DATA = Path(r"D:\SLIIT\3Y 2S\FDM\Mini Project\hotel_booking.csv\hotel_booking.csv")
+SOURCE_DATA = ROOT / "data" / "raw" / "hotel_booking.csv"
 OUT_DIR = ROOT / "01_Dataset_Understanding"
 RAW_DIR = ROOT / "data" / "raw"
 
@@ -369,7 +369,6 @@ def build_notebook() -> dict:
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     RAW_DIR.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(SOURCE_DATA, RAW_DIR / "hotel_booking.csv")
 
     df = pd.read_csv(SOURCE_DATA)
     data_dictionary = make_data_dictionary(df)
