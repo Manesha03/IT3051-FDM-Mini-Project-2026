@@ -1,0 +1,15 @@
+metric,value
+Dataset file,hotel_booking.csv
+Dataset status,Validated lecturer-approved raw dataset
+Problem type,Binary classification
+Prediction objective,Predict whether a hotel booking will be canceled
+Target variable,is_canceled
+Number of records,119390
+Number of columns including target,36
+Fully duplicated records,0
+Columns with missing values,4
+Feature type - Binary,2
+Feature type - Categorical,12
+Feature type - Date/Time,5
+Feature type - Identifier/PII,4
+Feature type - Numerical,13
