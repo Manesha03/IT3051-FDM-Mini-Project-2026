@@ -105,9 +105,21 @@ def build_notebook() -> dict:
             "plt.legend(title='is_canceled', labels=['Not canceled', 'Canceled'])\n"
             "save_current_figure('hotel_type_by_cancellation.png')"
         ),
-        code_cell("cancellation_rate_table(df, 'hotel')"),
-        markdown_cell("**Finding:** Hotel type is relevant because City Hotel and Resort Hotel bookings may have different cancellation behavior. This variable should be retained as a categorical predictor and encoded during preprocessing."),
-        markdown_cell("### 2.2 Arrival Period Analysis\n\nArrival month, year, week number, and day of month help reveal seasonality and period-based booking patterns."),
+        code_cell(
+            "hotel_cancel_rate = cancellation_rate_table(df, 'hotel')\n"
+            "hotel_cancel_rate"
+        ),
+        code_cell(
+            "highest_hotel = hotel_cancel_rate.iloc[0]\n"
+            "lowest_hotel = hotel_cancel_rate.iloc[-1]\n"
+            "rate_gap = highest_hotel['cancellation_rate'] - lowest_hotel['cancellation_rate']\n"
+            "print(f\"Observed result: {highest_hotel['hotel']} has the higher cancellation rate \"\n"
+            "      f\"({highest_hotel['cancellation_rate']:.2f}%) compared with {lowest_hotel['hotel']} \"\n"
+            "      f\"({lowest_hotel['cancellation_rate']:.2f}%).\")\n"
+            "print(f\"Difference: approximately {rate_gap:.2f} percentage points.\")"
+        ),
+        markdown_cell("**Finding:** The hotel-type comparison should be interpreted using the observed cancellation-rate table above. The hotel category with the higher cancellation rate may capture different booking behaviour, customer segments, or reservation conditions. This variable should be retained as a categorical predictor and encoded during preprocessing."),
+        markdown_cell("### 2.2 Arrival Period Analysis\n\nThis section focuses on arrival month and arrival year because they are the most meaningful period-level variables for identifying broad seasonal and yearly cancellation patterns. Week number and day of month are not visualized here to avoid adding less interpretable plots without a clear analytical purpose."),
         code_cell(
             "month_order = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']\n"
             "arrival_month_summary = cancellation_rate_table(df, 'arrival_date_month')\n"
@@ -128,7 +140,17 @@ def build_notebook() -> dict:
             "arrival_year_summary = cancellation_rate_table(df, 'arrival_date_year')\n"
             "arrival_year_summary"
         ),
-        markdown_cell("**Finding:** Arrival-period variables can capture seasonality. During preprocessing/feature engineering, month and year should be handled as time-related categorical or ordinal features depending on the modelling approach."),
+        code_cell(
+            "arrival_month_rates = arrival_month_summary.sort_values('cancellation_rate', ascending=False)\n"
+            "arrival_year_rates = arrival_year_summary.sort_values('cancellation_rate', ascending=False)\n"
+            "print(f\"Highest cancellation month: {arrival_month_rates.iloc[0]['arrival_date_month']} \"\n"
+            "      f\"({arrival_month_rates.iloc[0]['cancellation_rate']:.2f}%).\")\n"
+            "print(f\"Lowest cancellation month: {arrival_month_rates.iloc[-1]['arrival_date_month']} \"\n"
+            "      f\"({arrival_month_rates.iloc[-1]['cancellation_rate']:.2f}%).\")\n"
+            "print(f\"Highest cancellation year: {arrival_year_rates.iloc[0]['arrival_date_year']} \"\n"
+            "      f\"({arrival_year_rates.iloc[0]['cancellation_rate']:.2f}%).\")"
+        ),
+        markdown_cell("**Finding:** Arrival month and year show period-level differences in cancellation rates. These observed differences suggest that arrival timing may contain useful seasonal or yearly information. During preprocessing/feature engineering, month and year should be handled as time-related features rather than ignored."),
         markdown_cell("### 2.3 Stay Duration Analysis\n\nThis section examines weekend-night stays and week-night stays. It also proposes `total_stay` as a future engineered feature."),
         code_cell(
             "stay_columns = ['stays_in_weekend_nights', 'stays_in_week_nights']\n"
@@ -160,13 +182,32 @@ def build_notebook() -> dict:
             "plt.ylabel('Number of Bookings')\n"
             "save_current_figure('total_stay_distribution.png')"
         ),
-        markdown_cell("**Finding:** Weekend and week-night stays can be combined into `total_stay`. Zero-night and very long-stay records should be investigated before preprocessing decisions are made."),
+        code_cell(
+            "df_member2['stay_length_group'] = pd.cut(\n"
+            "    df_member2['total_stay'],\n"
+            "    bins=[-1, 0, 2, 7, np.inf],\n"
+            "    labels=['Zero-night stay', 'Short stay (1-2 nights)', 'Medium stay (3-7 nights)', 'Long stay (8+ nights)']\n"
+            ")\n"
+            "stay_length_cancel_rate = cancellation_rate_table(df_member2, 'stay_length_group')\n"
+            "stay_length_cancel_rate.sort_values('stay_length_group')"
+        ),
+        code_cell(
+            "stay_rates = stay_length_cancel_rate.sort_values('cancellation_rate', ascending=False)\n"
+            "print(f\"Highest cancellation stay group: {stay_rates.iloc[0]['stay_length_group']} \"\n"
+            "      f\"({stay_rates.iloc[0]['cancellation_rate']:.2f}%).\")\n"
+            "print(f\"Lowest cancellation stay group: {stay_rates.iloc[-1]['stay_length_group']} \"\n"
+            "      f\"({stay_rates.iloc[-1]['cancellation_rate']:.2f}%).\")"
+        ),
+        markdown_cell("**Finding:** The binned stay-length comparison provides a clearer target comparison for `total_stay`. If cancellation rates differ across stay-length groups, `total_stay` may be useful as an engineered feature. Zero-night and very long-stay records should still be investigated during preprocessing rather than removed during EDA."),
         markdown_cell("### 2.4 Guest Composition Analysis\n\nThis section analyses adults, children, and babies. It also proposes `total_guests` as a possible engineered feature."),
         code_cell(
             "guest_columns = ['adults', 'children', 'babies']\n"
             "df[guest_columns].describe().T.round(2)"
         ),
         code_cell(
+            "# EDA-only temporary treatment: children has 4 missing values.\n"
+            "# For exploratory calculation of total_guests, missing children values are temporarily treated as 0.\n"
+            "# Final missing-value treatment must be justified and performed during preprocessing.\n"
             "df_member2['children'] = df_member2['children'].fillna(0)\n"
             "df_member2['total_guests'] = df_member2['adults'] + df_member2['children'] + df_member2['babies']\n"
             "guest_summary = df_member2[['adults', 'children', 'babies', 'total_guests']].describe().T.round(2)\n"
@@ -187,7 +228,27 @@ def build_notebook() -> dict:
             "plt.legend(title='is_canceled', labels=['Not canceled', 'Canceled'])\n"
             "save_current_figure('total_guests_by_cancellation.png')"
         ),
-        markdown_cell("**Finding:** `total_guests` is a useful feature-engineering opportunity. Records with zero total guests should be treated as unusual and investigated during preprocessing."),
+        code_cell(
+            "df_member2['has_children'] = np.where(df_member2['children'] > 0, 'Has children', 'No children')\n"
+            "df_member2['has_babies'] = np.where(df_member2['babies'] > 0, 'Has babies', 'No babies')\n"
+            "children_babies_cancel_rate = pd.concat(\n"
+            "    [\n"
+            "        cancellation_rate_table(df_member2, 'has_children').assign(feature='children_presence'),\n"
+            "        cancellation_rate_table(df_member2, 'has_babies').assign(feature='babies_presence'),\n"
+            "    ],\n"
+            "    ignore_index=True\n"
+            ")\n"
+            "children_babies_cancel_rate"
+        ),
+        code_cell(
+            "children_rates = cancellation_rate_table(df_member2, 'has_children')\n"
+            "babies_rates = cancellation_rate_table(df_member2, 'has_babies')\n"
+            "print('Children presence cancellation rates:')\n"
+            "print(children_rates[['has_children', 'cancellation_rate']].to_string(index=False))\n"
+            "print('\\nBabies presence cancellation rates:')\n"
+            "print(babies_rates[['has_babies', 'cancellation_rate']].to_string(index=False))"
+        ),
+        markdown_cell("**Finding:** `total_guests` is a useful feature-engineering opportunity, but individual guest-composition indicators are also informative. Comparing bookings with and without children/babies gives a clearer view of how family-related guest composition relates to cancellation. Records with zero total guests should be treated as unusual and investigated during preprocessing."),
         markdown_cell("### 2.5 Meal Type Analysis"),
         code_cell("df['meal'].value_counts(dropna=False).to_frame('count')"),
         code_cell(
@@ -225,8 +286,18 @@ def build_notebook() -> dict:
             "plt.legend(title='is_canceled', labels=['Not canceled', 'Canceled'])\n"
             "save_current_figure('parking_spaces_by_cancellation.png')"
         ),
-        code_cell("cancellation_rate_table(df, 'required_car_parking_spaces')"),
-        markdown_cell("**Finding:** Parking requests may indicate stronger booking intention. This variable is numerical/discrete and may be useful without complex transformation, but rare high values should be reviewed."),
+        code_cell(
+            "parking_cancel_rate = cancellation_rate_table(df, 'required_car_parking_spaces')\n"
+            "parking_cancel_rate"
+        ),
+        code_cell(
+            "no_parking_rate = parking_cancel_rate.loc[parking_cancel_rate['required_car_parking_spaces'].eq(0), 'cancellation_rate'].iloc[0]\n"
+            "parking_requested = df.assign(parking_requested=np.where(df['required_car_parking_spaces'] > 0, 'Parking requested', 'No parking requested'))\n"
+            "parking_request_rate = cancellation_rate_table(parking_requested, 'parking_requested')\n"
+            "print(parking_request_rate.to_string(index=False))\n"
+            "print(f\"Cancellation rate for zero parking spaces: {no_parking_rate:.2f}%\")"
+        ),
+        markdown_cell("**Finding:** Parking should be interpreted from the observed cancellation-rate table above. If bookings with requested parking show a lower cancellation rate than bookings with no parking request, this supports the idea that parking requests may indicate stronger booking intention. The variable is discrete numerical and may be useful without complex transformation, while rare high values should be reviewed."),
         markdown_cell("### 2.8 Member 2 Outlier and Unusual Observation Summary"),
         code_cell(
             "member2_unusual = pd.DataFrame([\n"
