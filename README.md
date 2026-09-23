@@ -1,83 +1,172 @@
 # Hotel Booking Cancellation Prediction
 
-## Evaluation 1 - Dataset Selection & Understanding
+IT3051 Fundamentals of Data Mining - Mini Project
 
-This project currently contains only the Dataset Selection & Understanding stage for the IT3051 FDM Mini Project. The purpose of this stage is to understand the lecturer-validated Hotel Booking dataset before EDA, preprocessing, feature engineering, or modeling.
+## Project Overview
 
-## Folder Structure
+This project uses the lecturer-validated Hotel Booking dataset to study hotel booking cancellations. The final goal of the full project is to support cancellation prediction using historical booking information.
 
-```text
-IT3051-FDM-Mini-Project-2026/
-+-- 01_Dataset_Understanding/
-|   +-- Dataset_Selection_and_Understanding.ipynb
-|   +-- data_dictionary.csv
-|   +-- dataset_characteristics_summary.csv
-+-- data/
-|   +-- raw/
-|       +-- hotel_booking.csv
-+-- scripts/
-|   +-- generate_dataset_understanding.py
-+-- README.md
-```
+Current completed work:
 
-## Main Files
+- Dataset Selection & Understanding
+- EDA - Member 2: Stay & Reservation Analysis
 
-- `01_Dataset_Understanding/Dataset_Selection_and_Understanding.ipynb`  
-  Main notebook for Dataset Selection & Understanding. It includes the problem definition, dataset source, dataset shape, target variable, data dictionary, numerical statistics, categorical investigation, missing values, duplicates, unusual values, class distribution, potential leakage, suitability, and conclusion.
+Member 1 and Member 3 EDA sections are included as placeholders in the EDA notebook so the group can add their parts later.
 
-- `01_Dataset_Understanding/data_dictionary.csv`  
-  Attribute-level data dictionary for all 36 columns.
+## Dataset
 
-- `01_Dataset_Understanding/dataset_characteristics_summary.csv`  
-  Short dataset summary with record count, column count, target variable, duplicate count, missing-value column count, and feature-type counts.
-
-- `data/raw/hotel_booking.csv`  
-  Preserved copy of the approved raw dataset.
-
-- `scripts/generate_dataset_understanding.py`  
-  Script used to regenerate the notebook and CSV summary files from the approved dataset.
-
-## How to Run
-
-Open PowerShell in the project root:
-
-```powershell
-cd "D:\SLIIT\3Y 2S\FDM\Mini Project\FDM Mini Project\IT3051-FDM-Mini-Project-2026"
-```
-
-Regenerate the Dataset Understanding files:
-
-```powershell
-python scripts/generate_dataset_understanding.py
-```
-
-Then open and run:
-
-```text
-01_Dataset_Understanding/Dataset_Selection_and_Understanding.ipynb
-```
-
-Run the notebook cells from top to bottom. The notebook reads the raw dataset from:
+Dataset file:
 
 ```text
 data/raw/hotel_booking.csv
 ```
 
-## Required Python Packages
-
-The current stage requires:
+Target variable:
 
 ```text
-pandas
-numpy
+is_canceled
 ```
 
-If needed, install them using:
+Target meaning:
+
+```text
+0 = Booking was not canceled
+1 = Booking was canceled
+```
+
+## Repository Structure
+
+```text
+IT3051-FDM-Mini-Project-2026/
+├── 01_Dataset_Understanding/
+│   ├── Dataset_Selection_and_Understanding.ipynb
+│   ├── data_dictionary.csv
+│   └── dataset_characteristics_summary.csv
+├── 02_EDA/
+│   ├── EDA.ipynb
+│   └── Figures/
+│       └── stay_reservation/
+├── data/
+│   └── raw/
+│       └── hotel_booking.csv
+├── scripts/
+│   ├── generate_dataset_understanding.py
+│   └── generate_eda_member2.py
+└── README.md
+```
+
+## Main Deliverables
+
+### Dataset Understanding
+
+```text
+01_Dataset_Understanding/Dataset_Selection_and_Understanding.ipynb
+```
+
+Includes:
+
+- Problem definition
+- Dataset source and description
+- Dataset shape and structure
+- Target variable explanation
+- Data dictionary
+- Numerical descriptive statistics
+- Categorical value investigation
+- Missing-value investigation
+- Duplicate investigation
+- Invalid/unusual value checks
+- Initial class distribution
+- Potential data-leakage discussion
+- Dataset suitability and conclusion
+
+Supporting files:
+
+```text
+01_Dataset_Understanding/data_dictionary.csv
+01_Dataset_Understanding/dataset_characteristics_summary.csv
+```
+
+### EDA
+
+```text
+02_EDA/EDA.ipynb
+```
+
+Completed section:
+
+```text
+Member 2 - Stay & Reservation Analysis
+```
+
+Member 2 analysis covers:
+
+- Hotel type
+- Arrival period
+- Weekend-night stays
+- Week-night stays
+- Adults, children, and babies
+- Meal type
+- Reserved room type
+- Parking requirements
+- Related cancellation comparisons
+- Outliers and unusual observations
+- Feature-engineering opportunities such as `total_stay` and `total_guests`
+- Preprocessing implications
+
+Generated Member 2 figures:
+
+```text
+02_EDA/Figures/stay_reservation/
+```
+
+## Setup
+
+Run commands from the repository root folder.
+
+Install required Python packages:
 
 ```powershell
-pip install pandas numpy
+pip install pandas numpy matplotlib seaborn
 ```
 
-## Scope
+If running notebooks in VS Code, also install:
 
-This stage does not perform preprocessing, feature engineering, model training, model evaluation, or deployment. It is limited to Dataset Selection & Understanding only.
+```powershell
+pip install ipykernel
+```
+
+## How to Run the Notebooks
+
+Open either notebook in VS Code or Jupyter:
+
+```text
+01_Dataset_Understanding/Dataset_Selection_and_Understanding.ipynb
+02_EDA/EDA.ipynb
+```
+
+Select a Python kernel and run all cells from top to bottom.
+
+## How to Regenerate Outputs
+
+Regenerate Dataset Understanding files:
+
+```powershell
+python scripts/generate_dataset_understanding.py
+```
+
+Regenerate the EDA notebook and Member 2 figures:
+
+```powershell
+python scripts/generate_eda_member2.py
+```
+
+## Team Workflow Notes
+
+- Do not use machine-specific absolute paths in notebooks or documentation.
+- Keep dataset paths relative to the repository, such as `../data/raw/hotel_booking.csv`.
+- Member 1 and Member 3 should add their EDA work inside the existing placeholder sections in `02_EDA/EDA.ipynb`.
+- The current EDA stage investigates possible feature-engineering ideas but does not perform final preprocessing or model training.
+
+## Current Scope
+
+This repository currently covers Dataset Understanding and Member 2 EDA only. Final preprocessing, feature engineering, feature selection, modelling, model evaluation, and deployment are outside the current completed scope.
