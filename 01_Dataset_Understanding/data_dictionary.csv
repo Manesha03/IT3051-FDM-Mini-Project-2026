@@ -1,37 +1,37 @@
 attribute,description,attribute_type,pandas_dtype,missing_count,missing_percentage,unique_values,example_values,notes
-hotel,Type of hotel for the booking.,Categorical,str,0,0.0,2,Resort Hotel; City Hotel,
-is_canceled,Target variable: 1 if the booking was canceled and 0 if it was not canceled.,Binary,int64,0,0.0,2,0; 1,
-lead_time,Number of days between booking creation and arrival date.,Numerical,int64,0,0.0,479,342; 737; 7; 13; 14,
-arrival_date_year,Year of arrival.,Date/Time,int64,0,0.0,3,2015; 2016; 2017,
-arrival_date_month,Month of arrival.,Date/Time,str,0,0.0,12,July; August; September; October; November,
-arrival_date_week_number,Week number of the arrival date.,Date/Time,int64,0,0.0,53,27; 28; 29; 30; 31,
-arrival_date_day_of_month,Day of month of arrival.,Date/Time,int64,0,0.0,31,1; 2; 3; 4; 5,
-stays_in_weekend_nights,Number of weekend nights included in the stay.,Numerical,int64,0,0.0,17,0; 1; 2; 4; 3,
-stays_in_week_nights,Number of week nights included in the stay.,Numerical,int64,0,0.0,35,0; 1; 2; 3; 4,
-adults,Number of adults in the booking.,Numerical,int64,0,0.0,14,2; 1; 3; 4; 40,
-children,Number of children in the booking.,Numerical,float64,4,0.003,5,0.0; 1.0; 2.0; 10.0; 3.0,
-babies,Number of babies in the booking.,Numerical,int64,0,0.0,5,0; 1; 2; 10; 9,
-meal,Meal package booked by the guest.,Categorical,str,0,0.0,5,BB; FB; HB; SC; Undefined,
-country,Guest country of origin.,Categorical,str,488,0.409,177,PRT; GBR; USA; ESP; IRL,
-market_segment,Market segment through which the booking was made.,Categorical,str,0,0.0,8,Direct; Corporate; Online TA; Offline TA/TO; Complementary,
-distribution_channel,Booking distribution channel.,Categorical,str,0,0.0,5,Direct; Corporate; TA/TO; Undefined; GDS,
-is_repeated_guest,Indicates whether the guest is a repeated guest.,Binary,int64,0,0.0,2,0; 1,
-previous_cancellations,Number of previous bookings canceled by the customer.,Numerical,int64,0,0.0,15,0; 1; 2; 3; 26,
-previous_bookings_not_canceled,Number of previous bookings not canceled by the customer.,Numerical,int64,0,0.0,73,0; 1; 2; 3; 4,
-reserved_room_type,Room type originally reserved.,Categorical,str,0,0.0,10,C; A; D; E; G,
-assigned_room_type,Room type assigned to the booking.,Categorical,str,0,0.0,12,C; A; D; E; G,May be assigned after operational processing and should be reviewed before modeling.
-booking_changes,Number of changes made to the booking.,Numerical,int64,0,0.0,21,3; 4; 0; 1; 2,
-deposit_type,Type of deposit made for the booking.,Categorical,str,0,0.0,3,No Deposit; Refundable; Non Refund,
-agent,Travel agency identifier.,Categorical,float64,16340,13.686,333,304.0; 240.0; 303.0; 15.0; 241.0,
-company,Company/entity identifier associated with the booking.,Categorical,float64,112593,94.307,352,110.0; 113.0; 270.0; 178.0; 240.0,
-days_in_waiting_list,Number of days the booking stayed on the waiting list.,Numerical,int64,0,0.0,128,0; 50; 47; 65; 122,
-customer_type,Type of customer or booking contract.,Categorical,str,0,0.0,4,Transient; Contract; Transient-Party; Group,
-adr,Average Daily Rate calculated for the booking.,Numerical,float64,0,0.0,8879,0.0; 75.0; 98.0; 107.0; 103.0,
-required_car_parking_spaces,Number of car parking spaces required by the guest.,Numerical,int64,0,0.0,5,0; 1; 2; 8; 3,
-total_of_special_requests,Number of special requests made by the guest.,Numerical,int64,0,0.0,6,0; 1; 3; 2; 4,
-reservation_status,Final reservation status.,Categorical,str,0,0.0,3,Check-Out; Canceled; No-Show,Directly represents the final booking outcome.
-reservation_status_date,Date when the final reservation status was last updated.,Date/Time,str,0,0.0,926,7/1/2015; 7/2/2015; 7/3/2015; 5/6/2015; 4/22/2015,May be known only after cancellation/check-out status is confirmed.
-name,Guest name included in the validated dataset.,Identifier/PII,str,0,0.0,81503,Ernest Barnes; Andrea Baker; Rebecca Parker; Laura Murray; Linda Hines,
-email,Guest email address included in the validated dataset.,Identifier/PII,str,0,0.0,115889,Ernest.Barnes31@outlook.com; Andrea_Baker94@aol.com; Rebecca_Parker@comcast.net; Laura_M@gmail.com; LHines@verizon.com,
-phone-number,Guest phone number included in the validated dataset.,Identifier/PII,str,0,0.0,119390,669-792-1661; 858-637-6955; 652-885-2745; 364-656-8427; 713-226-5883,
-credit_card,Masked credit card value included in the validated dataset.,Identifier/PII,str,0,0.0,9000,************4322; ************9157; ************3734; ************5677; ************5498,
+hotel,Type of hotel for the booking.,Categorical,str,0,0.0,2,Resort Hotel; City Hotel,Useful categorical predictor; should be encoded during preprocessing.
+is_canceled,Target variable: 1 if the booking was canceled and 0 if it was not canceled.,Binary,int64,0,0.0,2,0; 1,Prediction target; must not be used as an input feature.
+lead_time,Number of days between booking creation and arrival date.,Numerical,int64,0,0.0,479,342; 737; 7; 13; 14,Important booking-timing predictor; check for high/extreme values during EDA.
+arrival_date_year,Year of arrival.,Date/Time,int64,0,0.0,3,2015; 2016; 2017,Date component; useful for period coverage and possible time-based patterns.
+arrival_date_month,Month of arrival.,Date/Time,str,0,0.0,12,July; August; September; October; November,Date component; useful for seasonality analysis and should be encoded carefully.
+arrival_date_week_number,Week number of the arrival date.,Date/Time,int64,0,0.0,53,27; 28; 29; 30; 31,Date component; useful for weekly arrival patterns.
+arrival_date_day_of_month,Day of month of arrival.,Date/Time,int64,0,0.0,31,1; 2; 3; 4; 5,Date component; useful for arrival-day pattern checks.
+stays_in_weekend_nights,Number of weekend nights included in the stay.,Numerical,int64,0,0.0,17,0; 1; 2; 4; 3,Stay-length feature; check zero-night and extreme-stay records.
+stays_in_week_nights,Number of week nights included in the stay.,Numerical,int64,0,0.0,35,0; 1; 2; 3; 4,Stay-length feature; check zero-night and extreme-stay records.
+adults,Number of adults in the booking.,Numerical,int64,0,0.0,14,2; 1; 3; 4; 40,Guest-count feature; check records with zero total guests.
+children,Number of children in the booking.,Numerical,float64,4,0.003,5,0.0; 1.0; 2.0; 10.0; 3.0,Guest-count feature; contains a small number of missing values.
+babies,Number of babies in the booking.,Numerical,int64,0,0.0,5,0; 1; 2; 10; 9,Guest-count feature; check rare or unusual high values during EDA.
+meal,Meal package booked by the guest.,Categorical,str,0,0.0,5,BB; FB; HB; SC; Undefined,Categorical predictor; Undefined/SC categories should be reviewed before encoding.
+country,Guest country of origin.,Categorical,str,488,0.409,177,PRT; GBR; USA; ESP; IRL,Categorical predictor with many unique values and some missing values.
+market_segment,Market segment through which the booking was made.,Categorical,str,0,0.0,8,Direct; Corporate; Online TA; Offline TA/TO; Complementary,Categorical predictor; Undefined values require investigation.
+distribution_channel,Booking distribution channel.,Categorical,str,0,0.0,5,Direct; Corporate; TA/TO; Undefined; GDS,Categorical predictor; Undefined values require investigation.
+is_repeated_guest,Indicates whether the guest is a repeated guest.,Binary,int64,0,0.0,2,0; 1,Binary predictor that may indicate guest history.
+previous_cancellations,Number of previous bookings canceled by the customer.,Numerical,int64,0,0.0,15,0; 1; 2; 3; 26,Customer-history feature; likely relevant to cancellation behavior.
+previous_bookings_not_canceled,Number of previous bookings not canceled by the customer.,Numerical,int64,0,0.0,73,0; 1; 2; 3; 4,Customer-history feature; likely relevant to repeat guest behavior.
+reserved_room_type,Room type originally reserved.,Categorical,str,0,0.0,10,C; A; D; E; G,Original room type selected at booking time; should be encoded during preprocessing.
+assigned_room_type,Room type assigned to the booking.,Categorical,str,0,0.0,12,C; A; D; E; G,"Not confirmed leakage, but a possible post-booking operational attribute that requires investigation before modeling."
+booking_changes,Number of changes made to the booking.,Numerical,int64,0,0.0,21,3; 4; 0; 1; 2,May reflect customer/booking changes before final outcome; timing should be understood before modeling.
+deposit_type,Type of deposit made for the booking.,Categorical,str,0,0.0,3,No Deposit; Refundable; Non Refund,Categorical predictor that may be strongly related to cancellation behavior.
+agent,Travel agency identifier.,Categorical,float64,16340,13.686,333,304.0; 240.0; 303.0; 15.0; 241.0,Identifier-like categorical field with missing values; missing may mean no agent.
+company,Company/entity identifier associated with the booking.,Categorical,float64,112593,94.307,352,110.0; 113.0; 270.0; 178.0; 240.0,Identifier-like categorical field with many missing values; missing may mean no company association.
+days_in_waiting_list,Number of days the booking stayed on the waiting list.,Numerical,int64,0,0.0,128,0; 50; 47; 65; 122,Operational feature; check skewness and high values during EDA.
+customer_type,Type of customer or booking contract.,Categorical,str,0,0.0,4,Transient; Contract; Transient-Party; Group,Categorical predictor describing booking/customer contract type.
+adr,Average Daily Rate calculated for the booking.,Numerical,float64,0,0.0,8879,0.0; 75.0; 98.0; 107.0; 103.0,Numerical price-related feature; check negative and extreme values.
+required_car_parking_spaces,Number of car parking spaces required by the guest.,Numerical,int64,0,0.0,5,0; 1; 2; 8; 3,Guest request feature; may indicate stronger booking intention.
+total_of_special_requests,Number of special requests made by the guest.,Numerical,int64,0,0.0,6,0; 1; 3; 2; 4,Guest request feature; may indicate stronger booking intention.
+reservation_status,Final reservation status.,Categorical,str,0,0.0,3,Check-Out; Canceled; No-Show,Confirmed leakage risk because it directly represents the final booking outcome.
+reservation_status_date,Date when the final reservation status was last updated.,Date/Time,str,0,0.0,926,7/1/2015; 7/2/2015; 7/3/2015; 5/6/2015; 4/22/2015,Confirmed leakage risk because it may be known only after cancellation/check-out status is confirmed.
+name,Guest name included in the validated dataset.,Identifier/PII,str,0,0.0,81503,Ernest Barnes; Andrea Baker; Rebecca Parker; Laura Murray; Linda Hines,PII/identifier field; should not be used as a predictive feature.
+email,Guest email address included in the validated dataset.,Identifier/PII,str,0,0.0,115889,Ernest.Barnes31@outlook.com; Andrea_Baker94@aol.com; Rebecca_Parker@comcast.net; Laura_M@gmail.com; LHines@verizon.com,PII/identifier field; should not be used as a predictive feature.
+phone-number,Guest phone number included in the validated dataset.,Identifier/PII,str,0,0.0,119390,669-792-1661; 858-637-6955; 652-885-2745; 364-656-8427; 713-226-5883,PII/identifier field; should not be used as a predictive feature.
+credit_card,Masked credit card value included in the validated dataset.,Identifier/PII,str,0,0.0,9000,************4322; ************9157; ************3734; ************5677; ************5498,Masked PII/identifier field; should not be used as a predictive feature.
