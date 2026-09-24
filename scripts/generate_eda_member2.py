@@ -431,7 +431,22 @@ def main() -> None:
     EDA_DIR.mkdir(parents=True, exist_ok=True)
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     notebook = build_notebook()
-    (EDA_DIR / "EDA.ipynb").write_text(json.dumps(notebook, indent=2), encoding="utf-8")
+    notebook_path = EDA_DIR / "EDA.ipynb"
+    if notebook_path.exists():
+        existing = json.loads(notebook_path.read_text(encoding="utf-8"))
+
+        def section_bounds(cells):
+            start = next(i for i, cell in enumerate(cells)
+                         if "".join(cell["source"]).startswith("## Member 2 -"))
+            end = next(i for i in range(start + 1, len(cells))
+                       if "".join(cells[i]["source"]).startswith("## Member 3 -"))
+            return start, end
+
+        start, end = section_bounds(existing["cells"])
+        new_start, new_end = section_bounds(notebook["cells"])
+        existing["cells"][start:end] = notebook["cells"][new_start:new_end]
+        notebook = existing
+    notebook_path.write_text(json.dumps(notebook, indent=2), encoding="utf-8")
     generate_member2_figures()
 
 
