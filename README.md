@@ -11,8 +11,7 @@ Current completed work:
 - Dataset Selection & Understanding
 - EDA - Member 1: Booking & Customer Behaviour Analysis
 - EDA - Member 2: Stay & Reservation Analysis
-
-Member 3's EDA section remains a placeholder in the shared notebook.
+- EDA - Member 3: Commercial & Distribution Analysis
 
 ## Dataset
 
@@ -46,13 +45,15 @@ IT3051-FDM-Mini-Project-2026/
 ├── 02_EDA/
 │   ├── EDA.ipynb
 │   └── Figures/
+│       ├── booking_customer/
+│       ├── commercial_distribution/
 │       └── stay_reservation/
 ├── data/
 │   └── raw/
 │       └── hotel_booking.csv
 ├── scripts/
 │   ├── generate_dataset_understanding.py
-│   └── generate_eda_member2.py
+│   └── generate_eda.py
 └── README.md
 ```
 
@@ -98,6 +99,7 @@ Completed sections:
 ```text
 Member 1 - Booking & Customer Behaviour Analysis
 Member 2 - Stay & Reservation Analysis
+Member 3 - Commercial & Distribution Analysis
 ```
 
 Member 1's analysis and findings are in the notebook. Its figures are saved in
@@ -122,6 +124,14 @@ Generated Member 2 figures:
 
 ```text
 02_EDA/Figures/stay_reservation/
+```
+
+Member 3 analysis covers commercial, distribution, country, room-assignment, missing-value, correlation, and leakage-related variables.
+
+Generated Member 3 figures:
+
+```text
+02_EDA/Figures/commercial_distribution/
 ```
 
 ## Setup
@@ -161,19 +171,18 @@ python scripts/generate_dataset_understanding.py
 
 Run Member 1's cells in the notebook to regenerate its analysis and figures.
 
-Regenerate Member 2's section and figures (preserving other members' sections):
+Regenerate the EDA notebook and figures:
 
 ```powershell
-python scripts/generate_eda_member2.py
+python scripts/generate_eda.py
 ```
 
 ## Team Workflow Notes
 
 - Do not use machine-specific absolute paths in notebooks or documentation.
 - Keep dataset paths relative to the repository, such as `../data/raw/hotel_booking.csv`.
-- Member 3 should add their EDA work inside the remaining placeholder in `02_EDA/EDA.ipynb`.
 - The current EDA stage investigates possible feature-engineering ideas but does not perform final preprocessing or model training.
 
 ## Current Scope
 
-This repository currently covers Dataset Understanding and Member 1 and Member 2 EDA. Final preprocessing, feature engineering, feature selection, modelling, model evaluation, and deployment are outside the current completed scope.
+This repository currently covers Dataset Understanding and Member 1, Member 2, and Member 3 EDA. Final preprocessing, feature engineering, feature selection, modelling, model evaluation, and deployment are outside the current completed scope.
