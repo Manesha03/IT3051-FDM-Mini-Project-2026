@@ -12,7 +12,7 @@ Current completed work:
 - EDA - Member 1: Booking & Customer Behaviour Analysis
 - EDA - Member 2: Stay & Reservation Analysis
 - EDA - Member 3: Commercial & Distribution Analysis
-- Preprocessing - Member 1: Data Cleaning & Quality Preparation
+- Full data preprocessing, without feature engineering
 
 ## Dataset
 
@@ -57,19 +57,33 @@ IT3051-FDM-Mini-Project-2026/
 │   ├── schema_report.csv
 │   ├── outlier_review.csv
 │   ├── removed_rows.csv
-│   └── target_distribution_comparison.csv
+│   ├── target_distribution_comparison.csv
+│   ├── preprocessing_columns.csv
+│   ├── train_test_summary.csv
+│   └── preprocessing_validation.csv
 ├── data/
 │   ├── raw/
 │   │   └── hotel_booking.csv
 │   └── processed/
-│       └── hotel_booking_cleaned.csv
+│       ├── hotel_booking_cleaned.csv
+│       └── model_inputs/
+│           ├── X_train.npz
+│           ├── X_test.npz
+│           ├── y_train.csv
+│           ├── y_test.csv
+│           ├── preprocessor.joblib
+│           ├── encoded_columns.csv
+│           ├── split_assignment.csv
+│           └── preprocessing_metadata.json
 ├── scripts/
 │   ├── generate_dataset_understanding.py
 │   ├── generate_eda.py
 │   ├── clean_hotel_bookings.py
+│   ├── preprocess_hotel_bookings.py
 │   └── generate_preprocessing.py
 ├── tests/
-│   └── test_data_cleaning.py
+│   ├── test_data_cleaning.py
+│   └── test_preprocessing.py
 ├── requirements.txt
 └── README.md
 ```
@@ -151,10 +165,10 @@ Generated Member 3 figures:
 02_EDA/Figures/commercial_distribution/
 ```
 
-### Preprocessing — Member 1
+### Data Preprocessing — No Feature Engineering
 
 Open `03_Data_Preprocessing_and_Feature_Engineering/Data_Preprocessing_and_Feature_Engineering.ipynb`
-for the executed cleaning workflow, EDA-based justifications, and before/after validation.
+for the executed cleaning, train/test preparation, encoding, scaling and validation workflow.
 
 - Excludes 4 records with unknown child counts, 180 zero-guest records, and 1 negative-ADR record under the documented cleaning policies.
 - Fills missing country with `Unknown` and missing agent/company IDs with `Not_recorded`.
@@ -162,16 +176,53 @@ for the executed cleaning workflow, EDA-based justifications, and before/after v
 - Retains valid extreme values, zero-night stays and ambiguous categories instead of applying arbitrary clipping or recoding.
 - Verifies retained target labels, numerical values, row accounting, raw-file integrity and exported CSV fidelity.
 
-The cleaned handoff has **119,205 rows and 36 columns**, with no remaining nulls or
+The cleaned dataset has **119,205 rows and 36 columns**, with no remaining nulls or
 exact duplicate records. Before/after metrics are in `data_quality_report.csv`; decisions
 are in `preprocessing_summary.csv`. `removed_rows.csv` gives zero-based source-row
 indices and exclusion reasons (source CSV line = index + 2).
 
-This is a cleaning-stage handoff. Member 2 still owns feature engineering, selection,
-encoding and removal of leakage/PII columns; Member 3 owns train/test preparation,
-train-only fitted transformations and final modelling validation. The cleaned CSV
-retains all source columns and must not be used directly as the model's predictors.
-Matching booking profiles remain for group/split review; they are not proven duplicate bookings.
+The cleaning workflow is: EDA finding → data-quality problem → cleaning decision →
+reason/justification → validation after cleaning. These steps are documented in
+`preprocessing_summary.csv`. The validation reports check the cleaned values, ranges,
+types, row removals and saved dataset.
+
+The following preprocessing steps use original predictor columns only:
+
+- Exclude outcome columns, personal identifiers and fields whose values may be recorded or updated after initial booking. Reasons are in `preprocessing_columns.csv`.
+- Separate `is_canceled` and split approximately 80/20 using the first fold of five-fold stratified group splitting (seed 42). Identical retained predictor profiles stay together.
+- Fit categorical one-hot encoders and numeric `RobustScaler` on training rows only; apply the fitted transformer to test rows.
+- Group rare country/agent/company levels using training frequencies only; handle previously unseen test categories.
+- Export and verify sparse training/test matrices, aligned labels, encoded column order and the fitted transformer.
+
+No derived predictors such as `total_stay`, `total_guests`, ratios or indicators are
+created. The cleaned CSV retains all original columns and is an intermediate artifact;
+use the processed matrices for later modelling. The intended prediction point is initial
+booking, but the source has no snapshots to confirm when every retained value was recorded.
+The grouped random split does not establish future-period performance or independence
+between customers whose booking profiles differ. No model is trained or evaluated here.
+
+`train_test_summary.csv` records partition sizes and class balance;
+`preprocessing_validation.csv` records checks for column exclusions, row alignment,
+group separation, finite values, train-only fitting and saved-file fidelity.
+
+Load the processed matrices and target columns:
+
+```python
+from pathlib import Path
+import pandas as pd
+from scipy.sparse import load_npz
+
+folder = Path('data/processed/model_inputs')
+X_train = load_npz(folder / 'X_train.npz')
+X_test = load_npz(folder / 'X_test.npz')
+y_train = pd.read_csv(folder / 'y_train.csv')['is_canceled']
+y_test = pd.read_csv(folder / 'y_test.csv')['is_canceled']
+```
+
+For new cleaned rows, load `preprocessor.joblib` with `joblib.load` and call `transform`
+on the original input columns listed in `preprocessing_metadata.json`. Use the recorded
+package versions when reloading the fitted object. `split_assignment.csv` is audit
+metadata and must not be included as predictors.
 
 CSV loses dtype metadata. To restore categories, dates and textual identifiers:
 
@@ -220,13 +271,13 @@ Regenerate the EDA notebook and figures:
 python scripts/generate_eda.py
 ```
 
-Regenerate and execute the Member 1 preprocessing notebook, cleaned CSV and reports:
+Regenerate and execute the preprocessing notebook, cleaned data, model inputs and reports:
 
 ```powershell
 python scripts/generate_preprocessing.py
 ```
 
-Run the cleaning regression checks:
+Run the cleaning and preprocessing regression checks:
 
 ```powershell
 python -m unittest discover -s tests -v
@@ -240,7 +291,7 @@ python -m unittest discover -s tests -v
 
 ## Current Scope
 
-This repository covers Dataset Understanding, all three EDA sections, and Member 1's
-data cleaning and quality preparation. Feature engineering, feature selection, encoding,
-train/test preparation, final ML validation, modelling, model evaluation and deployment
-remain outside the completed scope.
+This repository covers Dataset Understanding, all three EDA sections, and full data
+preprocessing through validated train/test inputs. Derived-feature engineering,
+model-based feature selection, model training, model evaluation and deployment remain
+outside the completed scope.

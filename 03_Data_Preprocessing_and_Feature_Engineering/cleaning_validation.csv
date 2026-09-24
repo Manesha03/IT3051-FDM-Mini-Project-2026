@@ -1,6 +1,6 @@
 check,passed
 Non-empty cleaned dataset,True
-All original columns preserved for handoff,True
+All original columns preserved during cleaning,True
 No remaining missing values,True
 No invalid values under documented rules,True
 No exact duplicate records,True

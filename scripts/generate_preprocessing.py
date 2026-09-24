@@ -1,4 +1,4 @@
-"""Build and execute the Member 1 preprocessing notebook and its deliverables."""
+"""Build and execute full data preprocessing, without derived predictor features."""
 
 from __future__ import annotations
 
@@ -24,28 +24,29 @@ def build_notebook() -> nbformat.NotebookNode:
         cells.append(nbformat.v4.new_code_cell(dedent(text).strip()))
 
     md("""
-    # 3 — Data Preprocessing & Feature Engineering + Final Validation
-    ## Member 1 — Data Cleaning & Quality Preparation
+    # Data Preprocessing — No Feature Engineering
+    ## Data Cleaning & Quality Preparation
 
-    **Objective:** turn the validated raw bookings into an auditable cleaned-data
-    handoff using the findings in `02_EDA/EDA.ipynb`. This notebook completes Member 1's
-    responsibilities: missingness, duplicates, invalid records, types, outlier review,
-    range validation, and before/after checks.
+    **Objective:** clean the validated raw bookings using the findings in
+    `02_EDA/EDA.ipynb`, then prepare separate training and test inputs. Cleaning covers
+    missingness, duplicates, invalid records, types, outlier review, range validation,
+    and before/after checks.
 
     **Workflow:** EDA finding → quality problem → cleaning decision → justification
     → validation. The raw file remains unchanged. The target is `is_canceled`
     (0 = not canceled, 1 = canceled); no target values are imputed or recoded.
 
-    This is a **cleaning-stage dataset**, not a final modelling matrix. Member 2 owns
-    feature engineering, selection, leakage-column removal and encoding; Member 3 owns
-    splitting, train-only fitted transformations, scaling and final ML validation.
+    **Scope:** cleaning, exclusion of unsuitable input columns, target separation,
+    train/test preparation, categorical encoding, scaling, and validation of saved
+    model inputs. No derived predictors such as `total_stay`, `total_guests`, ratios,
+    presence indicators, or date features are created. One-hot columns represent
+    existing categorical values.
     """)
     md("""
     ### 1. Reproducible setup
 
     Run all cells from the repository root or this notebook's folder. The shared Python
-    module implements explicit, testable cleaning rules. No median, mode, quantile cap,
-    frequency encoding, scaler or other learned transformation is fitted here.
+    module implements explicit, testable cleaning rules.
     """)
     code("""
     from pathlib import Path
@@ -93,8 +94,7 @@ def build_notebook() -> nbformat.NotebookNode:
       (approximately 0.0034% of the source). Unknown children are not assumed to be zero.
       This small, target-independent complete-case decision avoids a full-dataset
       imputation statistic. It may introduce selection bias; the class-impact report
-      below makes its impact visible. If retaining them becomes necessary, Member 3
-      should fit a numerical imputer on training data only.
+      below makes its impact visible.
     - **Country:** replace missing values with `Unknown`; do not guess a country or fit
       a global mode. **Agent/company:** use `Not_recorded` and categorical ID strings
       instead of floating-point measurements. Missing IDs may mean no association or
@@ -102,7 +102,7 @@ def build_notebook() -> nbformat.NotebookNode:
     - **Duplicates:** remove only complete, exact raw-row duplicates, keeping the first.
       The current source has none. Matching non-PII fields do not establish duplicate
       bookings; there is no reliable unique booking key. Retain these matches and report
-      them for Member 3's group/split review.
+      their counts as a data-quality observation.
     - **Zero total guests:** exclude records where adults + children + babies = 0
       under the project's guest-booking scope. Retain zero-adult records with children
       or babies. Total guests is calculated for validation only, not added as a feature.
@@ -142,8 +142,7 @@ def build_notebook() -> nbformat.NotebookNode:
     automatically. Below, raw-data IQR fences are **descriptive diagnostics only**;
     the same fences show before/after counts. They never determine retained rows or
     transformed values. Minima/maxima and integer checks verify the cleaned ranges.
-    Learned clipping, transformations or scaling remain train-only decisions for later
-    work. Positive extremes remain unresolved observations, not verified errors.
+    Positive extremes remain unresolved observations, not verified errors.
     """)
     code("""
     outliers = outlier_report(raw, cleaned)
@@ -186,16 +185,15 @@ def build_notebook() -> nbformat.NotebookNode:
     display(class_impact.round(4))
     """)
     md("""
-    ### 6. Export and validate the saved handoff
+    ### 6. Export and validate the cleaned dataset
 
     `data_quality_report.csv` holds before/after metrics; `preprocessing_summary.csv`
     links EDA findings to decisions and validation. Additional reports provide schema,
     outlier review, removal reasons and target impact. The cleaned CSV retains all
-    original columns for the team's next step, including leakage and PII columns.
+    original columns. The checks in this section verify the cleaning results and saved file.
 
     CSV does not preserve pandas categories or dates. Use `load_cleaned()` to restore
-    the schema; it loads ID values as strings. Category labels here are storage types,
-    not a fitted encoder. Later encoders must learn their vocabulary from training data.
+    the schema; it loads ID values as strings.
     """)
     code("""
     decisions = [
@@ -219,11 +217,21 @@ def build_notebook() -> nbformat.NotebookNode:
          'Insufficient evidence to delete or recode', 'Review counts and category preservation'),
         ('is_canceled', 'Dataset target definition', 'Preserve retained-row labels',
          'Cleaning must not change booking outcomes', 'Exact target alignment and class-impact report'),
-        ('team handoff', 'EDA 3.12: leakage and prediction-time concerns', 'Defer feature decisions and learned transforms',
-         'Member 2 owns features; Member 3 owns split/pipeline', 'Cleaning validation only; not ML-ready'),
     ]
     summary = pd.DataFrame(decisions, columns=[
-        'scope', 'eda_finding', 'cleaning_decision', 'justification', 'validation_or_handoff'
+        'scope', 'eda_finding', 'cleaning_decision', 'justification', 'validation_after_cleaning'
+    ])
+    summary.insert(2, 'data_quality_problem', [
+        'Incomplete guest composition because child counts are unknown',
+        'Missing country labels',
+        'Missing agency/company IDs and inappropriate floating-point ID types',
+        'Potential repeated records; matching booking attributes alone are ambiguous',
+        'Bookings with no recorded guests',
+        'Negative rate violates the chosen non-negative accommodation-rate policy',
+        'Counts, flags and dates need appropriate types and valid values',
+        'Skewed and zero-heavy values make automatic IQR removal unreliable',
+        'Unusual observations without evidence of a recording error',
+        'Row exclusions can change class proportions; retained labels must stay unchanged',
     ])
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     PROCESSED_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -248,7 +256,7 @@ def build_notebook() -> nbformat.NotebookNode:
     display(summary)
     """)
     md("""
-    ### 7. Member 1 conclusion and next-member handoff
+    ### 7. Cleaning results
 
     The current source contains **119,390 rows and 36 columns**. The documented rules
     exclude **185 rows** (4 missing child counts, 180 zero-guest rows, 1 negative ADR),
@@ -257,20 +265,106 @@ def build_notebook() -> nbformat.NotebookNode:
     booking-history records remain unchanged. The executed reports above are the
     authoritative results if the source changes.
 
-    **Member 2:** remove `reservation_status` and `reservation_status_date` from predictors;
-    exclude `name`, `email`, `phone-number`, and `credit_card`; review prediction-time
-    availability of `assigned_room_type`, `booking_changes`, waiting duration and requests.
-    Investigate/define `total_stay`, `total_guests`, feature selection and categorical
-    encoding. No new predictor features have been added by Member 1.
+    Completed responsibilities: missing-value handling, duplicate handling, invalid-record
+    handling, type correction, justified outlier decisions, value/range verification,
+    before/after quality checks, and documentation of each cleaning decision.
+    """)
+    md("""
+    ### 8. Predictor eligibility and prediction-time assumptions
 
-    **Member 3:** establish the prediction point and suitable split. Review identical
-    booking profiles and customer/group dependence before splitting, since exact-row
-    cleaning alone cannot guarantee independent train/test sets. Fit imputation (if
-    needed later), rare-category grouping, encoding, scaling and any outlier treatment
-    on training data only. Validate final X/y alignment, train/test shapes and leakage
-    removal. Do not use the entire cleaned CSV directly as X.
+    The next steps complete preprocessing using **original columns only**. The cleaned
+    CSV remains an intermediate dataset. Predictor exclusions are documented below.
+    `reservation_status` and `reservation_status_date` reveal the outcome; personal
+    fields are excluded. Room assignment, booking changes and completed waiting time
+    may be recorded after initial booking. Parking/special requests can change, and
+    the recorded ADR is not verified as the original quote, so these are conservatively
+    excluded from the initial-booking predictor set.
 
-    Final modelling readiness and model accuracy are outside this Member 1 deliverable.
+    Remaining fields are assumed to describe the booking and prior history available
+    at reservation creation. The source has no historical snapshots to verify every
+    field's availability. Removing confirmed leakage does not resolve that source-data
+    limitation. No correlation-based selection or derived-feature evaluation is performed.
+    """)
+    code("""
+    from scripts.preprocess_hotel_bookings import (
+        MODEL_DATA_DIR, prepare_predictors, preprocess, export_preprocessed,
+    )
+    X, y, column_decisions = prepare_predictors(cleaned)
+    display(column_decisions)
+    print(f'Original predictor columns: {X.shape[1]}; derived predictors: 0')
+    """)
+    md("""
+    ### 9. Group-aware train/test split and train-only transformations
+
+    Use the first fold of a five-fold `StratifiedGroupKFold` with shuffle enabled and
+    seed 42 for an approximately 80/20 split. All rows with identical **retained original
+    predictor values** share a group and remain in one partition; target values and
+    excluded columns do not define groups. Group hashes and row positions are audit
+    metadata, never predictors. Stratification attempts to preserve class balance;
+    group constraints can prevent exact proportions. This random grouped split does
+    not measure future-period generalization or guarantee independent customers when
+    no reliable customer/group key is available.
+
+    Fit one `ColumnTransformer` on training rows only:
+
+    - Numerical inputs: `RobustScaler` uses training medians and IQRs. A zero IQR uses
+      scale 1, so valid nonzero history counts are retained; no outliers are clipped.
+    - Nominal inputs: one-hot encoding preserves categories without imposing an order.
+      Unseen test categories become all-zero within that column's encoded block.
+    - Country/agent/company: one-hot encoding groups categories seen fewer than 50 times
+      in training, with at most 30 encoded levels per field. These are fixed policy
+      settings. Frequency counts and category vocabularies are learned from training
+      only. Unseen values use the infrequent level when present, otherwise all-zero.
+    - The existing `is_repeated_guest` binary flag passes through unchanged.
+
+    Missing values were handled by the fixed cleaning policies above; no statistical
+    imputation is fitted to the full dataset. Category dtype metadata is removed before
+    fitting encoders. The test partition is transformed using the fitted object without
+    refitting. The same scaling is suitable for later distance/linear models; tree models
+    generally do not require scaling. No model is trained here.
+    """)
+    code("""
+    processed = preprocess(cleaned)
+    display(processed['split_summary'].round(4))
+    display(processed['validation'])
+    """)
+    md("""
+    ### 10. Save and verify the processed inputs
+
+    `data/processed/model_inputs/` contains sparse `X_train.npz` and `X_test.npz`,
+    single-column `y_train.csv` and `y_test.csv`, ordered `encoded_columns.csv`, the
+    fitted `preprocessor.joblib`, and preprocessing settings/version metadata.
+    `split_assignment.csv` maps matrix-row positions to cleaned positions and original
+    source-row indices. It must never be included among predictors.
+
+    The reports `preprocessing_columns.csv`, `train_test_summary.csv` and
+    `preprocessing_validation.csv` document column treatment, partition shapes/class
+    balance and validation. Export checks reload matrices, target files and the fitted
+    preprocessor to confirm unchanged values and consistent transformations.
+    """)
+    code("""
+    export_preprocessed(processed)
+    preprocessing_checks = pd.read_csv(REPORT_DIR / 'preprocessing_validation.csv')
+    display(preprocessing_checks)
+    print(f'Saved processed inputs to {MODEL_DATA_DIR.relative_to(ROOT)}')
+    print(f'All {len(preprocessing_checks)} preprocessing checks passed; derived predictors: 0.')
+    """)
+    md("""
+    ### 11. Load the saved matrices for later modelling
+
+    These arrays contain the same ordered columns in both partitions. Read only the
+    `is_canceled` column as the target. The saved transformer applies the existing
+    training transformations to new cleaned rows containing the original predictor
+    columns listed in `preprocessing_metadata.json`.
+    """)
+    code("""
+    from scipy.sparse import load_npz
+    X_train = load_npz(MODEL_DATA_DIR / 'X_train.npz')
+    X_test = load_npz(MODEL_DATA_DIR / 'X_test.npz')
+    y_train = pd.read_csv(MODEL_DATA_DIR / 'y_train.csv')['is_canceled']
+    y_test = pd.read_csv(MODEL_DATA_DIR / 'y_test.csv')['is_canceled']
+    print(f'Training: X={X_train.shape}, y={y_train.shape}')
+    print(f'Test: X={X_test.shape}, y={y_test.shape}')
     """)
     return nbformat.v4.new_notebook(cells=cells, metadata={
         "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},

@@ -1,4 +1,4 @@
-"""Deterministic Member 1 cleaning; no fitted transforms or feature selection."""
+"""Member 1 data cleaning, type correction and data-quality checks."""
 
 from __future__ import annotations
 
@@ -47,7 +47,7 @@ def parse_status_dates(values: pd.Series) -> pd.Series:
 
 
 def invalid_masks(data: pd.DataFrame) -> pd.DataFrame:
-    """Row-level domain checks. Rules are fixed, not learned from test data."""
+    """Row-level checks against the documented cleaning rules."""
     counts = data[COUNT_COLUMNS]
     dates = data[DATE_COLUMNS]
     arrival = pd.to_datetime(pd.DataFrame({
@@ -152,7 +152,7 @@ def validate_cleaned(raw: pd.DataFrame, cleaned: pd.DataFrame, audit: pd.DataFra
 
     checks = {
         "Non-empty cleaned dataset": len(cleaned) > 0,
-        "All original columns preserved for handoff": cleaned.columns.equals(raw.columns),
+        "All original columns preserved during cleaning": cleaned.columns.equals(raw.columns),
         "No remaining missing values": not cleaned.isna().any().any(),
         "No invalid values under documented rules": not invalid_masks(cleaned).any().any(),
         "No exact duplicate records": not cleaned.duplicated().any(),

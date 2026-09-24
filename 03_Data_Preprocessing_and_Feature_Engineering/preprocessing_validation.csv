@@ -1,0 +1,18 @@
+check,passed
+No excluded columns or target among predictors,True
+All inputs are original columns; no derived predictors,True
+No remaining missing input values,True
+Every cleaned row belongs to exactly one partition,True
+Identical predictor profiles never cross partitions,True
+Both target classes occur in each partition,True
+Training and test target rows align with source,True
+Matrices have the same encoded columns,True
+Encoded column names are unique,True
+Matrix rows match target lengths,True
+All transformed values are finite,True
+Scaler center equals training median,True
+Scaler scale equals training IQR with zero-IQR fallback,True
+Encoder vocabularies contain training categories only,True
+Saved training and test matrices preserve values,True
+Saved training and test targets preserve labels,True
+Reloaded preprocessor reproduces test sample transformations,True
