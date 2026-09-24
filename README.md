@@ -9,9 +9,10 @@ This project uses the lecturer-validated Hotel Booking dataset to study hotel bo
 Current completed work:
 
 - Dataset Selection & Understanding
+- EDA - Member 1: Booking & Customer Behaviour Analysis
 - EDA - Member 2: Stay & Reservation Analysis
 
-Member 1 and Member 3 EDA sections are included as placeholders in the EDA notebook so the group can add their parts later.
+Member 3's EDA section remains a placeholder in the shared notebook.
 
 ## Dataset
 
@@ -92,11 +93,15 @@ Supporting files:
 02_EDA/EDA.ipynb
 ```
 
-Completed section:
+Completed sections:
 
 ```text
+Member 1 - Booking & Customer Behaviour Analysis
 Member 2 - Stay & Reservation Analysis
 ```
+
+Member 1's analysis and findings are in the notebook. Its figures are saved in
+`02_EDA/Figures/booking_customer/`.
 
 Member 2 analysis covers:
 
@@ -154,7 +159,9 @@ Regenerate Dataset Understanding files:
 python scripts/generate_dataset_understanding.py
 ```
 
-Regenerate the EDA notebook and Member 2 figures:
+Run Member 1's cells in the notebook to regenerate its analysis and figures.
+
+Regenerate Member 2's section and figures (preserving other members' sections):
 
 ```powershell
 python scripts/generate_eda_member2.py
@@ -164,9 +171,9 @@ python scripts/generate_eda_member2.py
 
 - Do not use machine-specific absolute paths in notebooks or documentation.
 - Keep dataset paths relative to the repository, such as `../data/raw/hotel_booking.csv`.
-- Member 1 and Member 3 should add their EDA work inside the existing placeholder sections in `02_EDA/EDA.ipynb`.
+- Member 3 should add their EDA work inside the remaining placeholder in `02_EDA/EDA.ipynb`.
 - The current EDA stage investigates possible feature-engineering ideas but does not perform final preprocessing or model training.
 
 ## Current Scope
 
-This repository currently covers Dataset Understanding and Member 2 EDA only. Final preprocessing, feature engineering, feature selection, modelling, model evaluation, and deployment are outside the current completed scope.
+This repository currently covers Dataset Understanding and Member 1 and Member 2 EDA. Final preprocessing, feature engineering, feature selection, modelling, model evaluation, and deployment are outside the current completed scope.
