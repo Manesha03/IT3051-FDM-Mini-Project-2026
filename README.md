@@ -151,7 +151,7 @@ Generated Member 3 figures:
 02_EDA/Figures/commercial_distribution/
 ```
 
-### Preprocessing — Member 1 (Razna)
+### Preprocessing — Member 1
 
 Open `03_Data_Preprocessing_and_Feature_Engineering/Data_Preprocessing_and_Feature_Engineering.ipynb`
 for the executed cleaning workflow, EDA-based justifications, and before/after validation.

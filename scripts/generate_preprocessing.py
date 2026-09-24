@@ -25,7 +25,7 @@ def build_notebook() -> nbformat.NotebookNode:
 
     md("""
     # 3 — Data Preprocessing & Feature Engineering + Final Validation
-    ## Member 1 — Data Cleaning & Quality Preparation (Razna)
+    ## Member 1 — Data Cleaning & Quality Preparation
 
     **Objective:** turn the validated raw bookings into an auditable cleaned-data
     handoff using the findings in `02_EDA/EDA.ipynb`. This notebook completes Member 1's
