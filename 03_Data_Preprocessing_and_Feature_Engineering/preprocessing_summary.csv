@@ -1,0 +1,12 @@
+scope,eda_finding,cleaning_decision,justification,validation_or_handoff
+children,EDA 2.9 / 3.9: four missing counts,Exclude incomplete rows,Avoid inventing child counts; tiny target-independent exclusion,No missing/fractional/negative counts
+country,EDA 3.5 / 3.9: missing country,Fill Unknown,Preserve uncertainty without a fitted global mode,No null country values
+"agent, company",EDA 3.6 / 3.9: missing identifier-like fields,Fill Not_recorded; categorical string IDs,Missing association is ambiguous; IDs are not magnitudes,No nulls; nominal dtypes
+duplicates,Dataset understanding: zero full duplicates,Drop exact raw duplicates only,Matching booking attributes do not prove the same booking,Exact duplicates zero; non-PII matches reported
+guest composition,EDA 2.9: zero-guest observations,Exclude confirmed zero-total-guest rows,Project scope requires at least one guest,Positive total guests; retain children-only bookings
+adr,"EDA 3.4: negative, zero and extreme rates",Exclude negative/non-finite rates; retain zero/positive extremes,Explicit non-negative rate policy; no verified upper cutoff,Finite non-negative ADR; retained values unchanged
+"counts, binaries, dates",Dataset dictionary and EDA unusual-value checks,Apply domain checks and explicit types,"Counts are integers, flags are binary, dates must parse",Domain/type validation passes
+outliers,EDA 1.11 / 3.4: zero IQR and skewed distributions,Report only; no automatic clipping,Rare observations are not necessarily errors,Before/after ranges; retained numeric values unchanged
+"zero nights, Undefined, repeat/history",EDA 1.12 / 2.9 / 3.12: unusual observations,Retain for documented review,Insufficient evidence to delete or recode,Review counts and category preservation
+is_canceled,Dataset target definition,Preserve retained-row labels,Cleaning must not change booking outcomes,Exact target alignment and class-impact report
+team handoff,EDA 3.12: leakage and prediction-time concerns,Defer feature decisions and learned transforms,Member 2 owns features; Member 3 owns split/pipeline,Cleaning validation only; not ML-ready

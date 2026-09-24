@@ -1,0 +1,16 @@
+check,passed
+Non-empty cleaned dataset,True
+All original columns preserved for handoff,True
+No remaining missing values,True
+No invalid values under documented rules,True
+No exact duplicate records,True
+Row counts reconcile with removal audit,True
+Retained rows and excluded rows partition source,True
+Target labels unchanged for every retained row,True
+Counts have integer types,True
+Binary fields have integer types,True
+Categorical fields have category types,True
+Status date has datetime type,True
+Numerical values unchanged on retained rows,True
+Saved CSV restores identical values and schema,True
+Raw file SHA-256 unchanged,True
