@@ -37,8 +37,7 @@ def build_notebook() -> dict:
             "# 2 - Exploratory Data Analysis (EDA)\n\n"
             "## Hotel Booking Cancellation Prediction\n\n"
             "This notebook is prepared for the EDA stage of the IT3051 FDM Mini Project. "
-            "The current completed section is **Member 2 - Stay & Reservation Analysis**. "
-            "Placeholder sections are included for Member 1 and Member 3 so their analyses can be added later."
+            "Members 1, 2, and 3 have completed their assigned EDA sections."
         ),
         markdown_cell(
             "## EDA Objective\n\n"
@@ -87,8 +86,8 @@ def build_notebook() -> dict:
             "target_summary['percentage'] = (target_summary['count'] / len(df) * 100).round(2)\n"
             "target_summary"
         ),
-        markdown_cell("## Member 1 - Booking & Customer Behaviour Analysis (Placeholder)\n\nThis section is reserved for Member 1. Suggested variables include lead time, previous cancellations, previous bookings not canceled, repeated guest, booking changes, days in waiting list, special requests, customer type, and related target comparisons."),
-        markdown_cell("## Member 2 - Stay & Reservation Analysis\n\nThis section analyses stay and reservation attributes assigned to Member 2:\n\n- Hotel type\n- Arrival period\n- Weekend-night stays\n- Week-night stays\n- Adults, children, babies\n- Meal\n- Reserved room type\n- Parking requirements\n- Related target comparisons\n- Outliers or unusual observations\n- Feature-engineering opportunities such as `total_stay` and `total_guests`"),
+        markdown_cell("## Member 1 - Booking & Customer Behaviour Analysis\n\nThis section examines all eight assigned variables using the original booking rows. `is_canceled`: 0 = not canceled; 1 = canceled. Counts describe bookings, not unique customers. Distributions, target comparisons, and unusual observations are descriptive associations, not causal effects. No rows are removed, imputed, capped, or transformed in the source dataset. Groupings and log views are for EDA only."),
+        markdown_cell("## Member 2 - Stay & Reservation Analysis\n\nAnalysed stay and reservation-related features to identify their relationship with booking cancellations. The analysis covered hotel type, arrival period, weekend and weekday stays, guest composition, meal type, reserved room type, and parking requirements. It also investigated unusual observations and explored potential engineered features such as `total_stay` and `total_guests` to support later preprocessing and feature-engineering decisions."),
         markdown_cell("### 2.1 Hotel Type Distribution and Cancellation Rate"),
         code_cell(
             "hotel_counts = df['hotel'].value_counts().reset_index()\n"
@@ -312,7 +311,7 @@ def build_notebook() -> dict:
             "member2_unusual"
         ),
         markdown_cell("### 2.9 Member 2 Preprocessing and Feature-Engineering Implications\n\n- Encode categorical variables: `hotel`, `arrival_date_month`, `meal`, and `reserved_room_type`.\n- Consider engineering `total_stay = stays_in_weekend_nights + stays_in_week_nights`.\n- Consider engineering `total_guests = adults + children + babies`.\n- Investigate zero-night bookings and zero-guest bookings before cleaning.\n- Handle the small number of missing `children` values during preprocessing.\n- Review rare categories in `meal` and `reserved_room_type` before encoding.\n- Keep `required_car_parking_spaces` as a useful discrete numerical feature, while reviewing rare high values."),
-        markdown_cell("## Member 3 - Commercial & Distribution Analysis (Placeholder)\n\nThis section is reserved for Member 3. Suggested variables include market segment, distribution channel, deposit type, agent/company, ADR, country, assigned room type, correlations, high-cardinality variables, missing-value patterns, and data-leakage variables such as `reservation_status` and `reservation_status_date`."),
+        markdown_cell("## Member 3 - Commercial & Distribution Analysis\n\nAnalysed commercial, distribution, and pricing-related booking features and their relationships with cancellations. The analysis covered market segment, distribution channel, deposit type, ADR, country, agent/company, and assigned room type. It also investigated numerical correlations, high-cardinality variables, missing-value patterns, unusual values, and potential data-leakage features such as `reservation_status` and `reservation_status_date` to guide preprocessing and feature-selection decisions."),
         markdown_cell("## Overall EDA Conclusion and Recommendations (To Be Completed After All Members Finish)\n\nThis section should combine Member 1, Member 2, and Member 3 findings into one final EDA conclusion and preprocessing/feature-engineering recommendation section."),
     ]
     return {
