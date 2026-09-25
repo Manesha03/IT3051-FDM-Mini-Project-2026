@@ -10,7 +10,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW_PATH = ROOT / "data/raw/hotel_booking.csv"
-REPORT_DIR = ROOT / "03_Data_Preprocessing_and_Feature_Engineering"
+REPORT_DIR = ROOT / "03_Data_Preprocessing"
 PROCESSED_PATH = ROOT / "data/processed/hotel_booking_cleaned.csv"
 PII_COLUMNS = ["name", "email", "phone-number", "credit_card"]
 COUNT_COLUMNS = [

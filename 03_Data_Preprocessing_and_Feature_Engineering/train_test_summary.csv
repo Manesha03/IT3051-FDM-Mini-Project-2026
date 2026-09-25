@@ -1,3 +1,0 @@
-split,rows,percent_of_cleaned_rows,target_0,target_1,cancellation_rate_pct,profile_groups,encoded_columns
-train,95368,80.00335556394447,60010,35358,37.07532925090177,65415,139
-test,23837,19.996644436055536,15000,8837,37.07261819859882,16368,139

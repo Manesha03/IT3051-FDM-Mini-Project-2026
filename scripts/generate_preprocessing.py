@@ -1,4 +1,4 @@
-"""Build and execute full data preprocessing, without derived predictor features."""
+"""Build and execute the Member 1 data-cleaning notebook only."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from nbclient import NotebookClient
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "03_Data_Preprocessing_and_Feature_Engineering"
+OUTPUT = ROOT / "03_Data_Preprocessing"
 
 
 def build_notebook() -> nbformat.NotebookNode:
@@ -24,23 +24,20 @@ def build_notebook() -> nbformat.NotebookNode:
         cells.append(nbformat.v4.new_code_cell(dedent(text).strip()))
 
     md("""
-    # Data Preprocessing — No Feature Engineering
+    # Data Preprocessing
     ## Data Cleaning & Quality Preparation
 
     **Objective:** clean the validated raw bookings using the findings in
-    `02_EDA/EDA.ipynb`, then prepare separate training and test inputs. Cleaning covers
-    missingness, duplicates, invalid records, types, outlier review, range validation,
-    and before/after checks.
+    `02_EDA/EDA.ipynb`. Cleaning covers missingness, duplicates, invalid records,
+    types, outlier review, range validation, and before/after checks.
 
     **Workflow:** EDA finding → quality problem → cleaning decision → justification
     → validation. The raw file remains unchanged. The target is `is_canceled`
     (0 = not canceled, 1 = canceled); no target values are imputed or recoded.
 
-    **Scope:** cleaning, exclusion of unsuitable input columns, target separation,
-    train/test preparation, categorical encoding, scaling, and validation of saved
-    model inputs. No derived predictors such as `total_stay`, `total_guests`, ratios,
-    presence indicators, or date features are created. One-hot columns represent
-    existing categorical values.
+    **Scope:** data cleaning and quality validation only. No predictor selection,
+    feature engineering, target/predictor separation, train/test preparation, encoding,
+    scaling, model-input export, or ML prediction work is performed here.
     """)
     md("""
     ### 1. Reproducible setup
@@ -269,103 +266,6 @@ def build_notebook() -> nbformat.NotebookNode:
     handling, type correction, justified outlier decisions, value/range verification,
     before/after quality checks, and documentation of each cleaning decision.
     """)
-    md("""
-    ### 8. Predictor eligibility and prediction-time assumptions
-
-    The next steps complete preprocessing using **original columns only**. The cleaned
-    CSV remains an intermediate dataset. Predictor exclusions are documented below.
-    `reservation_status` and `reservation_status_date` reveal the outcome; personal
-    fields are excluded. Room assignment, booking changes and completed waiting time
-    may be recorded after initial booking. Parking/special requests can change, and
-    the recorded ADR is not verified as the original quote, so these are conservatively
-    excluded from the initial-booking predictor set.
-
-    Remaining fields are assumed to describe the booking and prior history available
-    at reservation creation. The source has no historical snapshots to verify every
-    field's availability. Removing confirmed leakage does not resolve that source-data
-    limitation. No correlation-based selection or derived-feature evaluation is performed.
-    """)
-    code("""
-    from scripts.preprocess_hotel_bookings import (
-        MODEL_DATA_DIR, prepare_predictors, preprocess, export_preprocessed,
-    )
-    X, y, column_decisions = prepare_predictors(cleaned)
-    display(column_decisions)
-    print(f'Original predictor columns: {X.shape[1]}; derived predictors: 0')
-    """)
-    md("""
-    ### 9. Group-aware train/test split and train-only transformations
-
-    Use the first fold of a five-fold `StratifiedGroupKFold` with shuffle enabled and
-    seed 42 for an approximately 80/20 split. All rows with identical **retained original
-    predictor values** share a group and remain in one partition; target values and
-    excluded columns do not define groups. Group hashes and row positions are audit
-    metadata, never predictors. Stratification attempts to preserve class balance;
-    group constraints can prevent exact proportions. This random grouped split does
-    not measure future-period generalization or guarantee independent customers when
-    no reliable customer/group key is available.
-
-    Fit one `ColumnTransformer` on training rows only:
-
-    - Numerical inputs: `RobustScaler` uses training medians and IQRs. A zero IQR uses
-      scale 1, so valid nonzero history counts are retained; no outliers are clipped.
-    - Nominal inputs: one-hot encoding preserves categories without imposing an order.
-      Unseen test categories become all-zero within that column's encoded block.
-    - Country/agent/company: one-hot encoding groups categories seen fewer than 50 times
-      in training, with at most 30 encoded levels per field. These are fixed policy
-      settings. Frequency counts and category vocabularies are learned from training
-      only. Unseen values use the infrequent level when present, otherwise all-zero.
-    - The existing `is_repeated_guest` binary flag passes through unchanged.
-
-    Missing values were handled by the fixed cleaning policies above; no statistical
-    imputation is fitted to the full dataset. Category dtype metadata is removed before
-    fitting encoders. The test partition is transformed using the fitted object without
-    refitting. The same scaling is suitable for later distance/linear models; tree models
-    generally do not require scaling. No model is trained here.
-    """)
-    code("""
-    processed = preprocess(cleaned)
-    display(processed['split_summary'].round(4))
-    display(processed['validation'])
-    """)
-    md("""
-    ### 10. Save and verify the processed inputs
-
-    `data/processed/model_inputs/` contains sparse `X_train.npz` and `X_test.npz`,
-    single-column `y_train.csv` and `y_test.csv`, ordered `encoded_columns.csv`, the
-    fitted `preprocessor.joblib`, and preprocessing settings/version metadata.
-    `split_assignment.csv` maps matrix-row positions to cleaned positions and original
-    source-row indices. It must never be included among predictors.
-
-    The reports `preprocessing_columns.csv`, `train_test_summary.csv` and
-    `preprocessing_validation.csv` document column treatment, partition shapes/class
-    balance and validation. Export checks reload matrices, target files and the fitted
-    preprocessor to confirm unchanged values and consistent transformations.
-    """)
-    code("""
-    export_preprocessed(processed)
-    preprocessing_checks = pd.read_csv(REPORT_DIR / 'preprocessing_validation.csv')
-    display(preprocessing_checks)
-    print(f'Saved processed inputs to {MODEL_DATA_DIR.relative_to(ROOT)}')
-    print(f'All {len(preprocessing_checks)} preprocessing checks passed; derived predictors: 0.')
-    """)
-    md("""
-    ### 11. Load the saved matrices for later modelling
-
-    These arrays contain the same ordered columns in both partitions. Read only the
-    `is_canceled` column as the target. The saved transformer applies the existing
-    training transformations to new cleaned rows containing the original predictor
-    columns listed in `preprocessing_metadata.json`.
-    """)
-    code("""
-    from scipy.sparse import load_npz
-    X_train = load_npz(MODEL_DATA_DIR / 'X_train.npz')
-    X_test = load_npz(MODEL_DATA_DIR / 'X_test.npz')
-    y_train = pd.read_csv(MODEL_DATA_DIR / 'y_train.csv')['is_canceled']
-    y_test = pd.read_csv(MODEL_DATA_DIR / 'y_test.csv')['is_canceled']
-    print(f'Training: X={X_train.shape}, y={y_train.shape}')
-    print(f'Test: X={X_test.shape}, y={y_test.shape}')
-    """)
     return nbformat.v4.new_notebook(cells=cells, metadata={
         "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
         "language_info": {"name": "python"},
@@ -381,7 +281,7 @@ def main() -> None:
     NotebookClient(notebook, timeout=180, kernel_name="python3", resources={
         "metadata": {"path": str(ROOT)}
     }).execute()
-    path = OUTPUT / "Data_Preprocessing_and_Feature_Engineering.ipynb"
+    path = OUTPUT / "Data_Preprocessing.ipynb"
     nbformat.write(notebook, path)
     print(f"Executed and saved {path.relative_to(ROOT)}")
 
