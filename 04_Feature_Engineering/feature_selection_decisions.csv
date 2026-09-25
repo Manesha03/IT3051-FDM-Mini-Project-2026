@@ -1,0 +1,43 @@
+column,action,reason
+hotel,retain_original,Cleaned source feature retained for later modelling.
+is_canceled,target,Prediction outcome; kept separately for later ML preparation.
+lead_time,retain_original,Cleaned source feature retained for later modelling.
+arrival_date_year,retain_original,Cleaned source feature retained for later modelling.
+arrival_date_month,retain_original,Cleaned source feature retained for later modelling.
+arrival_date_week_number,retain_original,Cleaned source feature retained for later modelling.
+arrival_date_day_of_month,retain_original,Cleaned source feature retained for later modelling.
+stays_in_weekend_nights,retain_original_component,Retained with total_stay because weekend and weekday stay patterns can differ.
+stays_in_week_nights,retain_original_component,Retained with total_stay because weekend and weekday stay patterns can differ.
+adults,retain_original_component,Retained with total_guests because party composition can matter beyond party size.
+children,retain_original_component,Retained with total_guests and has_children because exact composition can matter.
+babies,retain_original_component,Retained with total_guests and has_babies because exact composition can matter.
+meal,retain_original,Cleaned source feature retained for later modelling.
+country,retain_original,Cleaned source feature retained for later modelling.
+market_segment,retain_original,Cleaned source feature retained for later modelling.
+distribution_channel,retain_original,Cleaned source feature retained for later modelling.
+is_repeated_guest,retain_original,Cleaned source feature retained for later modelling.
+previous_cancellations,retain_original_component,Retained with engineered history summaries to preserve raw history counts.
+previous_bookings_not_canceled,retain_original_component,Retained with engineered history summaries to preserve raw history counts.
+reserved_room_type,retain_original,Cleaned source feature retained for later modelling.
+assigned_room_type,exclude,Actual assigned room may be known after reservation creation.
+booking_changes,exclude,Counts changes that can happen after the initial reservation.
+deposit_type,retain_original,Cleaned source feature retained for later modelling.
+agent,retain_original,Cleaned source feature retained for later modelling.
+company,retain_original,Cleaned source feature retained for later modelling.
+days_in_waiting_list,exclude,Completed waiting duration is not known at initial booking.
+customer_type,retain_original,Cleaned source feature retained for later modelling.
+adr,retain_original,Cleaned source feature retained for later modelling.
+required_car_parking_spaces,retain_original,Retained under the project assumption that parking requirements are recorded when the initial reservation is created.
+total_of_special_requests,retain_original,Retained under the project assumption that special requests are recorded when the initial reservation is created.
+reservation_status,exclude,Directly encodes the final booking outcome.
+reservation_status_date,exclude,Recorded after the final booking outcome/status is known.
+name,exclude,Personal identifier; not useful or appropriate for modelling.
+email,exclude,Personal identifier; not useful or appropriate for modelling.
+phone-number,exclude,Personal identifier; not useful or appropriate for modelling.
+credit_card,exclude,Personal identifier; not useful or appropriate for modelling.
+total_stay,retain_engineered,Derived from cleaned booking fields and evaluated for target relationship.
+total_guests,retain_engineered,Derived from cleaned booking fields and evaluated for target relationship.
+has_children,retain_engineered,Derived from cleaned booking fields and evaluated for target relationship.
+has_babies,retain_engineered,Derived from cleaned booking fields and evaluated for target relationship.
+previous_total_bookings,retain_engineered,Derived from cleaned booking fields and evaluated for target relationship.
+previous_cancellation_rate,retain_engineered,Derived from cleaned booking fields and evaluated for target relationship.
