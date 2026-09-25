@@ -1,0 +1,14 @@
+metric,value,description
+input_rows,119205,Rows in the selected feature dataset
+selected_predictors,32,Predictors before encoding
+training_rows,95364,Rows reserved for training
+test_rows,23841,Rows reserved for final testing
+training_not_canceled,60008,Training target class 0
+training_canceled,35356,Training target class 1
+test_not_canceled,15002,Test target class 0
+test_canceled,8839,Test target class 1
+transformed_features,116,Features after preprocessing
+overlapping_train_test_rows,0,Expected: 0
+training_non_finite_values,0,Expected: 0
+test_non_finite_values,0,Expected: 0
+excluded_fields_in_predictors,0,Expected: 0
