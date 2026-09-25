@@ -1,0 +1,33 @@
+column,encoding_strategy,unique_values_full_cleaned_data,reason
+hotel,one_hot,2,Nominal categorical field; one-hot encoding avoids artificial ordering.
+lead_time,numeric_passthrough_or_scale_later,479,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.
+arrival_date_year,numeric_passthrough_or_scale_later,3,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.
+arrival_date_month,one_hot,12,Nominal categorical field; one-hot encoding avoids artificial ordering.
+arrival_date_week_number,numeric_passthrough_or_scale_later,53,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.
+arrival_date_day_of_month,numeric_passthrough_or_scale_later,31,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.
+stays_in_weekend_nights,numeric_passthrough_or_scale_later,17,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.
+stays_in_week_nights,numeric_passthrough_or_scale_later,33,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.
+adults,numeric_passthrough_or_scale_later,14,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.
+children,numeric_passthrough_or_scale_later,5,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.
+babies,numeric_passthrough_or_scale_later,5,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.
+meal,one_hot,5,Nominal categorical field; one-hot encoding avoids artificial ordering.
+country,one_hot_with_rare_grouping,178,High-cardinality nominal field; group rare levels using training data only in ML preparation.
+market_segment,one_hot,7,Nominal categorical field; one-hot encoding avoids artificial ordering.
+distribution_channel,one_hot,5,Nominal categorical field; one-hot encoding avoids artificial ordering.
+is_repeated_guest,binary_passthrough,2,Already represented as a 0/1 indicator.
+previous_cancellations,numeric_passthrough_or_scale_later,15,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.
+previous_bookings_not_canceled,numeric_passthrough_or_scale_later,73,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.
+reserved_room_type,one_hot,9,Nominal categorical field; one-hot encoding avoids artificial ordering.
+deposit_type,one_hot,3,Nominal categorical field; one-hot encoding avoids artificial ordering.
+agent,one_hot_with_rare_grouping,334,High-cardinality nominal field; group rare levels using training data only in ML preparation.
+company,one_hot_with_rare_grouping,349,High-cardinality nominal field; group rare levels using training data only in ML preparation.
+customer_type,one_hot,4,Nominal categorical field; one-hot encoding avoids artificial ordering.
+adr,numeric_passthrough_or_scale_later,8865,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.
+required_car_parking_spaces,numeric_passthrough_or_scale_later,5,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.
+total_of_special_requests,numeric_passthrough_or_scale_later,6,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.
+total_stay,numeric_passthrough_or_scale_later,42,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.
+total_guests,numeric_passthrough_or_scale_later,14,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.
+has_children,binary_passthrough,2,Already represented as a 0/1 indicator.
+has_babies,binary_passthrough,2,Already represented as a 0/1 indicator.
+previous_total_bookings,numeric_passthrough_or_scale_later,77,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.
+previous_cancellation_rate,numeric_passthrough_or_scale_later,111,Keep numerical value; scaling choice belongs to ML data preparation after train/test split.

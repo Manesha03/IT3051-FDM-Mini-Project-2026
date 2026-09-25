@@ -1,0 +1,10 @@
+check,passed
+Target column is present,True
+All engineered columns selected,True
+Confirmed leakage columns absent,True
+PII columns absent,True
+Prediction-time uncertain columns absent,True
+No missing values in selected dataset,True
+Target remains binary,True
+Row count preserved from cleaned dataset,True
+Selected column names are unique,True
