@@ -13,6 +13,7 @@ Completed work so far:
 - Data cleaning and preprocessing
 - Feature engineering and feature selection
 - ML data preparation and final validation
+- Modelling framework started
 
 Remaining project work:
 
@@ -94,6 +95,10 @@ IT3051-FDM-Mini-Project-2026/
 |-- 05_ML_Data_Preparation/
 |   |-- ML_Data_Preparation_and_Final_Validation.ipynb
 |   `-- data_quality_report.csv
+|-- 06_Model_Evaluation/
+|   |-- Shared_Model_Setup.ipynb
+|   |-- Logistic_Regression.ipynb
+|   `-- Decision_Tree.ipynb
 |-- data/
 |   |-- raw/
 |   |   `-- hotel_booking.csv
@@ -106,7 +111,9 @@ IT3051-FDM-Mini-Project-2026/
 |   |-- generate_dataset_understanding.py
 |   |-- generate_eda.py
 |   |-- generate_feature_engineering.py
+|   |-- generate_model_evaluation.py
 |   |-- generate_preprocessing.py
+|   |-- model_evaluation_utils.py
 |   `-- preprocess_hotel_bookings.py
 |-- tests/
 |   |-- test_data_cleaning.py
@@ -315,6 +322,37 @@ Generated report:
 05_ML_Data_Preparation/data_quality_report.csv
 ```
 
+### 6. Model Development and Evaluation
+
+Shared setup notebook:
+
+```text
+06_Model_Evaluation/Shared_Model_Setup.ipynb
+```
+
+Model notebooks:
+
+```text
+06_Model_Evaluation/Logistic_Regression.ipynb
+06_Model_Evaluation/Decision_Tree.ipynb
+```
+
+Shared utility script:
+
+```text
+scripts/model_evaluation_utils.py
+```
+
+Current modelling setup includes:
+
+- Shared train/test split from `hotel_booking_features.csv`
+- Shared preprocessing pipeline
+- Shared `random_state`
+- Stratified K-Fold cross-validation
+- Common metrics: accuracy, precision, recall, F1-score, ROC-AUC and PR-AUC
+- Logistic Regression baseline notebook
+- Decision Tree baseline and tuning notebook
+
 ## Current Status
 
 The project is currently ready for model training and evaluation. The cleaned and feature-engineered datasets are available, and ML data preparation has been documented and validated.
@@ -391,6 +429,12 @@ Regenerate the feature-engineering notebook, feature dataset and feature reports
 
 ```powershell
 python scripts/generate_feature_engineering.py
+```
+
+Regenerate the shared setup and model notebooks:
+
+```powershell
+python scripts/generate_model_evaluation.py
 ```
 
 Run available regression checks:
