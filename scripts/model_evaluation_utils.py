@@ -246,9 +246,3 @@ def confusion_matrix_frame(y_true: pd.Series, y_pred: Iterable[int]) -> pd.DataF
     )
 
 
-def save_results(frame: pd.DataFrame, filename: str) -> Path:
-    """Save an evaluation result table under 06_Model_Evaluation."""
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    path = OUTPUT_DIR / filename
-    frame.to_csv(path, index=False)
-    return path
