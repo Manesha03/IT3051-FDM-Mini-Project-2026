@@ -137,6 +137,7 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     import numpy as np
     import matplotlib.pyplot as plt
     from sklearn.linear_model import LogisticRegression
+    from sklearn.model_selection import GridSearchCV
     from sklearn.metrics import RocCurveDisplay, PrecisionRecallDisplay
 
     from scripts.model_evaluation_utils import (
@@ -146,6 +147,7 @@ def build_logistic_regression() -> nbformat.NotebookNode:
         split_feature_dataset,
         class_distribution,
         build_pipeline,
+        get_cv,
         cross_validation_summary,
         fit_and_evaluate,
         confusion_matrix_frame,
@@ -298,7 +300,105 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     bookings are predicted as cancellations. The final choice should depend on
     whether missing cancellations is more costly than extra follow-up actions.
     """)
-    add_markdown(cells, "## 12. Coefficients and Odds Ratios")
+    add_markdown(cells, """
+    ## 12. Logistic Regression Hyperparameter Tuning
+
+    This grid search tunes regularization strength and class weighting with
+    training data only. F1-score is used for refitting because the cancellation
+    class needs a practical balance between precision and recall.
+    """)
+    add_code(cells, """
+    tuned_logistic_base = build_pipeline(
+        LogisticRegression(
+            max_iter=2000,
+            solver="lbfgs",
+            random_state=RANDOM_STATE,
+        ),
+        prepared.X_train,
+    )
+
+    logistic_param_grid = {
+        "model__C": [0.01, 0.1, 1.0, 10.0],
+        "model__class_weight": [None, "balanced"],
+    }
+
+    logistic_search = GridSearchCV(
+        estimator=tuned_logistic_base,
+        param_grid=logistic_param_grid,
+        scoring="f1",
+        cv=get_cv(),
+        n_jobs=1,
+        return_train_score=True,
+    )
+    logistic_search.fit(prepared.X_train, prepared.y_train)
+
+    print("Best Logistic Regression parameters:")
+    print(logistic_search.best_params_)
+    print(f"Best CV F1: {logistic_search.best_score_:.4f}")
+    """)
+    add_markdown(cells, """
+    **Tuning choice:** `C` controls the strength of regularization. Smaller
+    values create a simpler model, while larger values allow coefficients to
+    fit the training data more closely. Class weighting is included to test
+    whether recall gains justify the precision trade-off for the cancellation
+    class.
+    """)
+    add_markdown(cells, "## 13. Tuned Cross-Validation")
+    add_code(cells, """
+    tuned_logistic_pipeline = logistic_search.best_estimator_
+
+    tuned_logistic_cv = cross_validation_summary(
+        "Logistic Regression",
+        "Tuned",
+        tuned_logistic_pipeline,
+        prepared.X_train,
+        prepared.y_train,
+    )
+    display(tuned_logistic_cv.round(4))
+    """)
+    add_markdown(cells, "## 14. Tuned Final Test Evaluation")
+    add_code(cells, """
+    tuned_logistic_pipeline, tuned_logistic_test = fit_and_evaluate(
+        "Logistic Regression",
+        "Tuned",
+        tuned_logistic_pipeline,
+        prepared,
+    )
+
+    tuned_logistic_test_results = pd.DataFrame([tuned_logistic_test])
+    display(tuned_logistic_test_results.round(4))
+    """)
+    add_markdown(cells, "## 15. Tuned Confusion Matrix")
+    add_code(cells, """
+    tuned_logistic_predictions = tuned_logistic_pipeline.predict(prepared.X_test)
+    tuned_logistic_confusion = confusion_matrix_frame(prepared.y_test, tuned_logistic_predictions)
+    display(tuned_logistic_confusion)
+    """)
+    add_markdown(cells, "## 16. Baseline vs Class-Weighted vs Tuned Comparison")
+    add_code(cells, """
+    logistic_test_results = pd.DataFrame([
+        logistic_test,
+        weighted_logistic_test,
+        tuned_logistic_test,
+    ])
+    logistic_cv_results = pd.concat([
+        logistic_cv,
+        weighted_logistic_cv,
+        tuned_logistic_cv,
+    ], ignore_index=True)
+
+    display(logistic_test_results.round(4))
+    display(logistic_cv_results.round(4))
+    """)
+    add_markdown(cells, """
+    **Optimization interpretation:** The tuned model should be selected only if
+    it improves the chosen validation objective or gives a better practical
+    precision-recall trade-off on the final test set. If tuning selects
+    `class_weight='balanced'`, that supports the earlier imbalance experiment.
+    If it selects no class weighting, that means the extra recall was not worth
+    the precision loss under the F1 objective.
+    """)
+    add_markdown(cells, "## 17. Coefficients and Odds Ratios")
     add_code(cells, """
     def coefficient_table(pipeline, version, top_n=15):
         feature_names = pipeline.named_steps["preprocessor"].get_feature_names_out()
@@ -314,27 +414,35 @@ def build_logistic_regression() -> nbformat.NotebookNode:
 
     baseline_coefficients = coefficient_table(logistic_pipeline, "Baseline")
     weighted_coefficients = coefficient_table(weighted_logistic_pipeline, "Class Weighted")
+    tuned_coefficients = coefficient_table(tuned_logistic_pipeline, "Tuned")
 
     print("Top baseline coefficients")
     display(baseline_coefficients.round(4))
 
     print("Top class-weighted coefficients")
     display(weighted_coefficients.round(4))
+
+    print("Top tuned coefficients")
+    display(tuned_coefficients.round(4))
     """)
     add_markdown(cells, """
     **Coefficient interpretation:** Positive coefficients increase the log-odds
     of cancellation, while negative coefficients reduce them. Odds ratios above
     1 indicate higher cancellation odds; values below 1 indicate lower
     cancellation odds. The class-weighted coefficients show how the model shifts
-    when cancelled bookings receive more importance during fitting.
+    when cancelled bookings receive more importance during fitting. The tuned
+    coefficient table explains which variables remain most influential after
+    the selected regularization and weighting choices.
     """)
-    add_markdown(cells, "## 13. ROC and Precision-Recall Curves")
+    add_markdown(cells, "## 18. ROC and Precision-Recall Curves")
     add_code(cells, """
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
     RocCurveDisplay.from_estimator(logistic_pipeline, prepared.X_test, prepared.y_test, ax=axes[0], name="Baseline")
     RocCurveDisplay.from_estimator(weighted_logistic_pipeline, prepared.X_test, prepared.y_test, ax=axes[0], name="Class Weighted")
+    RocCurveDisplay.from_estimator(tuned_logistic_pipeline, prepared.X_test, prepared.y_test, ax=axes[0], name="Tuned")
     PrecisionRecallDisplay.from_estimator(logistic_pipeline, prepared.X_test, prepared.y_test, ax=axes[1], name="Baseline")
     PrecisionRecallDisplay.from_estimator(weighted_logistic_pipeline, prepared.X_test, prepared.y_test, ax=axes[1], name="Class Weighted")
+    PrecisionRecallDisplay.from_estimator(tuned_logistic_pipeline, prepared.X_test, prepared.y_test, ax=axes[1], name="Tuned")
     axes[0].set_title("Logistic Regression ROC Curves")
     axes[1].set_title("Logistic Regression Precision-Recall Curves")
     plt.tight_layout()
@@ -342,13 +450,14 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     plt.show()
     """)
     add_markdown(cells, """
-    ## 14. Interpretation Notes
+    ## 19. Interpretation Notes
 
     Logistic Regression should remain in the final comparison as the interpretable
     linear model. The baseline version shows normal performance at the natural
-    class distribution, while the class-weighted version directly addresses the
-    imbalance between cancelled and non-cancelled bookings. The coefficient
-    tables provide the explanation layer needed for the final report.
+    class distribution, the class-weighted version directly addresses the
+    imbalance between cancelled and non-cancelled bookings, and the tuned version
+    records the best cross-validated regularization and weighting choice. The
+    coefficient tables provide the explanation layer needed for the final report.
     """)
     return notebook(cells)
 
