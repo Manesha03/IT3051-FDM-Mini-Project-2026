@@ -134,6 +134,7 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     add_code(cells, shared_import_cell() + """
 
     import pandas as pd
+    import numpy as np
     import matplotlib.pyplot as plt
     from sklearn.linear_model import LogisticRegression
     from sklearn.metrics import RocCurveDisplay, PrecisionRecallDisplay
@@ -148,7 +149,6 @@ def build_logistic_regression() -> nbformat.NotebookNode:
         cross_validation_summary,
         fit_and_evaluate,
         confusion_matrix_frame,
-        save_results,
     )
 
     FIGURE_DIR = OUTPUT_DIR / "Figures"
@@ -168,7 +168,23 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     print("\\nTest class distribution")
     display(class_distribution(prepared.y_test))
     """)
-    add_markdown(cells, "## 2. Baseline Model")
+    add_markdown(cells, "## 2. Class Imbalance Review")
+    add_code(cells, """
+    training_distribution = class_distribution(prepared.y_train)
+    negative_count = int((prepared.y_train == 0).sum())
+    positive_count = int((prepared.y_train == 1).sum())
+    total_count = len(prepared.y_train)
+
+    class_weights = {
+        0: total_count / (2 * negative_count),
+        1: total_count / (2 * positive_count),
+    }
+
+    print("Balanced class weights used by LogisticRegression(class_weight='balanced'):")
+    print(class_weights)
+    display(training_distribution)
+    """)
+    add_markdown(cells, "## 3. Baseline Model")
     add_code(cells, """
     logistic_model = LogisticRegression(
         max_iter=1000,
@@ -178,7 +194,7 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     logistic_pipeline = build_pipeline(logistic_model, prepared.X_train)
     logistic_pipeline
     """)
-    add_markdown(cells, "## 3. Cross-Validation")
+    add_markdown(cells, "## 4. Baseline Cross-Validation")
     add_code(cells, """
     logistic_cv = cross_validation_summary(
         "Logistic Regression",
@@ -196,7 +212,7 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     generalization before looking at the final test set. A small gap between
     training and validation scores indicates limited overfitting.
     """)
-    add_markdown(cells, "## 4. Final Test Evaluation")
+    add_markdown(cells, "## 5. Baseline Final Test Evaluation")
     add_code(cells, """
     logistic_pipeline, logistic_test = fit_and_evaluate(
         "Logistic Regression",
@@ -215,39 +231,124 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     as a stable and interpretable baseline, but its recall should be checked
     carefully because low recall means more actual cancellations are missed.
     """)
-    add_markdown(cells, "## 5. Confusion Matrix")
+    add_markdown(cells, "## 6. Baseline Confusion Matrix")
     add_code(cells, """
     logistic_predictions = logistic_pipeline.predict(prepared.X_test)
     logistic_confusion = confusion_matrix_frame(prepared.y_test, logistic_predictions)
     display(logistic_confusion)
     """)
-    add_markdown(cells, "## 6. ROC and Precision-Recall Curves")
+    add_markdown(cells, "## 7. Class-Weighted Logistic Regression")
+    add_code(cells, """
+    weighted_logistic_model = LogisticRegression(
+        max_iter=1000,
+        solver="lbfgs",
+        class_weight="balanced",
+        random_state=RANDOM_STATE,
+    )
+    weighted_logistic_pipeline = build_pipeline(weighted_logistic_model, prepared.X_train)
+    weighted_logistic_pipeline
+    """)
+    add_markdown(cells, "## 8. Class-Weighted Cross-Validation")
+    add_code(cells, """
+    weighted_logistic_cv = cross_validation_summary(
+        "Logistic Regression",
+        "Class Weighted",
+        weighted_logistic_pipeline,
+        prepared.X_train,
+        prepared.y_train,
+    )
+    display(weighted_logistic_cv.round(4))
+    """)
+    add_markdown(cells, "## 9. Class-Weighted Final Test Evaluation")
+    add_code(cells, """
+    weighted_logistic_pipeline, weighted_logistic_test = fit_and_evaluate(
+        "Logistic Regression",
+        "Class Weighted",
+        weighted_logistic_pipeline,
+        prepared,
+    )
+
+    weighted_logistic_test_results = pd.DataFrame([weighted_logistic_test])
+    display(weighted_logistic_test_results.round(4))
+    """)
+    add_markdown(cells, "## 10. Class-Weighted Confusion Matrix")
+    add_code(cells, """
+    weighted_logistic_predictions = weighted_logistic_pipeline.predict(prepared.X_test)
+    weighted_logistic_confusion = confusion_matrix_frame(prepared.y_test, weighted_logistic_predictions)
+    display(weighted_logistic_confusion)
+    """)
+    add_markdown(cells, "## 11. Baseline vs Class-Weighted Comparison")
+    add_code(cells, """
+    logistic_test_results = pd.DataFrame([
+        logistic_test,
+        weighted_logistic_test,
+    ])
+    logistic_cv_results = pd.concat([
+        logistic_cv,
+        weighted_logistic_cv,
+    ], ignore_index=True)
+
+    display(logistic_test_results.round(4))
+    display(logistic_cv_results.round(4))
+    """)
+    add_markdown(cells, """
+    **Class-imbalance interpretation:** The class-weighted model gives the
+    cancellation class a larger penalty during training. This usually increases
+    recall for cancelled bookings, but it can reduce precision because more
+    bookings are predicted as cancellations. The final choice should depend on
+    whether missing cancellations is more costly than extra follow-up actions.
+    """)
+    add_markdown(cells, "## 12. Coefficients and Odds Ratios")
+    add_code(cells, """
+    def coefficient_table(pipeline, version, top_n=15):
+        feature_names = pipeline.named_steps["preprocessor"].get_feature_names_out()
+        coefficients = pipeline.named_steps["model"].coef_[0]
+        frame = pd.DataFrame({
+            "version": version,
+            "feature": feature_names,
+            "coefficient": coefficients,
+            "odds_ratio": np.exp(coefficients),
+            "absolute_coefficient": np.abs(coefficients),
+        })
+        return frame.sort_values("absolute_coefficient", ascending=False).head(top_n)
+
+    baseline_coefficients = coefficient_table(logistic_pipeline, "Baseline")
+    weighted_coefficients = coefficient_table(weighted_logistic_pipeline, "Class Weighted")
+
+    print("Top baseline coefficients")
+    display(baseline_coefficients.round(4))
+
+    print("Top class-weighted coefficients")
+    display(weighted_coefficients.round(4))
+    """)
+    add_markdown(cells, """
+    **Coefficient interpretation:** Positive coefficients increase the log-odds
+    of cancellation, while negative coefficients reduce them. Odds ratios above
+    1 indicate higher cancellation odds; values below 1 indicate lower
+    cancellation odds. The class-weighted coefficients show how the model shifts
+    when cancelled bookings receive more importance during fitting.
+    """)
+    add_markdown(cells, "## 13. ROC and Precision-Recall Curves")
     add_code(cells, """
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
-    RocCurveDisplay.from_estimator(logistic_pipeline, prepared.X_test, prepared.y_test, ax=axes[0])
-    PrecisionRecallDisplay.from_estimator(logistic_pipeline, prepared.X_test, prepared.y_test, ax=axes[1])
-    axes[0].set_title("Logistic Regression ROC Curve")
-    axes[1].set_title("Logistic Regression Precision-Recall Curve")
+    RocCurveDisplay.from_estimator(logistic_pipeline, prepared.X_test, prepared.y_test, ax=axes[0], name="Baseline")
+    RocCurveDisplay.from_estimator(weighted_logistic_pipeline, prepared.X_test, prepared.y_test, ax=axes[0], name="Class Weighted")
+    PrecisionRecallDisplay.from_estimator(logistic_pipeline, prepared.X_test, prepared.y_test, ax=axes[1], name="Baseline")
+    PrecisionRecallDisplay.from_estimator(weighted_logistic_pipeline, prepared.X_test, prepared.y_test, ax=axes[1], name="Class Weighted")
+    axes[0].set_title("Logistic Regression ROC Curves")
+    axes[1].set_title("Logistic Regression Precision-Recall Curves")
     plt.tight_layout()
     plt.savefig(FIGURE_DIR / "logistic_regression_curves.png", dpi=300, bbox_inches="tight")
     plt.show()
     """)
-    add_markdown(cells, "## 7. Save Results")
-    add_code(cells, """
-    test_path = save_results(logistic_test_results, "logistic_regression_test_results.csv")
-    cv_path = save_results(logistic_cv, "logistic_regression_cv_results.csv")
-
-    print(f"Saved final test results to: {test_path.relative_to(ROOT)}")
-    print(f"Saved CV results to: {cv_path.relative_to(ROOT)}")
-    """)
     add_markdown(cells, """
-    ## 8. Interpretation Notes
+    ## 14. Interpretation Notes
 
-    Logistic Regression should remain in the final comparison as the linear
-    baseline. It is easy to explain and usually less prone to overfitting than a
-    fully grown tree. If its ROC-AUC is strong but recall/F1 are lower than tree
-    models, the discussion should explain that it ranks cancellation risk well
-    overall but may miss more cancelled bookings at the default 0.50 threshold.
+    Logistic Regression should remain in the final comparison as the interpretable
+    linear model. The baseline version shows normal performance at the natural
+    class distribution, while the class-weighted version directly addresses the
+    imbalance between cancelled and non-cancelled bookings. The coefficient
+    tables provide the explanation layer needed for the final report.
     """)
     return notebook(cells)
 
@@ -280,7 +381,6 @@ def build_decision_tree() -> nbformat.NotebookNode:
         cross_validation_summary,
         fit_and_evaluate,
         confusion_matrix_frame,
-        save_results,
     )
 
     FIGURE_DIR = OUTPUT_DIR / "Figures"
@@ -487,16 +587,8 @@ def build_decision_tree() -> nbformat.NotebookNode:
     plt.savefig(FIGURE_DIR / "decision_tree_visualization.png", dpi=300, bbox_inches="tight")
     plt.show()
     """)
-    add_markdown(cells, "## 13. Save Results")
-    add_code(cells, """
-    test_path = save_results(decision_tree_test_results, "decision_tree_test_results.csv")
-    cv_path = save_results(decision_tree_cv_results, "decision_tree_cv_results.csv")
-
-    print(f"Saved final test results to: {test_path.relative_to(ROOT)}")
-    print(f"Saved CV results to: {cv_path.relative_to(ROOT)}")
-    """)
     add_markdown(cells, """
-    ## 14. Interpretation Notes
+    ## 13. Interpretation Notes
 
     The baseline Decision Tree is expected to achieve very high training scores
     because it can grow deep and memorize patterns. The tuned tree is more
@@ -801,4 +893,13 @@ def main(execute: bool = False) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Generate model-evaluation notebooks.")
+    parser.add_argument(
+        "--execute",
+        action="store_true",
+        help="Execute notebooks while generating them so notebook outputs and figures are refreshed.",
+    )
+    args = parser.parse_args()
+    main(execute=args.execute)

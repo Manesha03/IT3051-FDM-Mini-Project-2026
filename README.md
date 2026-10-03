@@ -6,20 +6,18 @@ IT3051 Fundamentals of Data Mining - Mini Project
 
 This project uses the lecturer-validated Hotel Booking dataset to study and prepare data for hotel booking cancellation prediction. The target is to predict whether a booking will be cancelled using historical booking details available before the final reservation outcome.
 
-Completed work so far:
+Completed work:
 
 - Dataset selection and understanding
 - Exploratory Data Analysis (EDA)
 - Data cleaning and preprocessing
 - Feature engineering and feature selection
 - ML data preparation and final validation
-- Modelling framework started
+- Model training and evaluation
+- Final model comparison and selection
 
 Remaining project work:
 
-- Model training
-- Model evaluation and comparison
-- Final model selection
 - Final report/presentation preparation
 
 ## Dataset
@@ -345,31 +343,20 @@ Shared utility script:
 scripts/model_evaluation_utils.py
 ```
 
-Current modelling setup includes:
+Completed modelling setup includes:
 
 - Shared train/test split from `hotel_booking_features.csv`
 - Shared preprocessing pipeline
 - Shared `random_state`
 - Stratified K-Fold cross-validation
 - Common metrics: accuracy, precision, recall, F1-score, ROC-AUC and PR-AUC
-- Logistic Regression baseline notebook
+- Logistic Regression baseline, class-weighted model and coefficient interpretation notebook
 - Decision Tree baseline and tuning notebook
 - Random Forest baseline, tuning, feature-importance and feature-ablation notebook
 
 ## Current Status
 
-The project is currently ready for model training and evaluation. The cleaned and feature-engineered datasets are available, and ML data preparation has been documented and validated.
-
-The next stage should train and compare suitable classification models, such as:
-
-- Logistic Regression
-- Decision Tree
-- Random Forest
-- K-Nearest Neighbours
-- Naive Bayes
-- Support Vector Machine
-
-Model performance should be evaluated using suitable classification metrics, including accuracy, precision, recall, F1-score, confusion matrix and ROC-AUC where appropriate.
+The project has completed dataset preparation, model training, model evaluation and final model selection. The remaining work is to prepare the final report and presentation using the generated notebooks, figures and comparison tables.
 
 ## Setup
 
@@ -438,6 +425,12 @@ Regenerate the shared setup and model notebooks:
 
 ```powershell
 python scripts/generate_model_evaluation.py
+```
+
+Regenerate and execute the model notebooks and figures:
+
+```powershell
+python scripts/generate_model_evaluation.py --execute
 ```
 
 Run available regression checks:
