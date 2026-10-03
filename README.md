@@ -98,7 +98,8 @@ IT3051-FDM-Mini-Project-2026/
 |-- 06_Model_Evaluation/
 |   |-- Shared_Model_Setup.ipynb
 |   |-- Logistic_Regression.ipynb
-|   `-- Decision_Tree.ipynb
+|   |-- Decision_Tree.ipynb
+|   `-- Random_Forest.ipynb
 |-- data/
 |   |-- raw/
 |   |   `-- hotel_booking.csv
@@ -335,6 +336,7 @@ Model notebooks:
 ```text
 06_Model_Evaluation/Logistic_Regression.ipynb
 06_Model_Evaluation/Decision_Tree.ipynb
+06_Model_Evaluation/Random_Forest.ipynb
 ```
 
 Shared utility script:
@@ -352,6 +354,7 @@ Current modelling setup includes:
 - Common metrics: accuracy, precision, recall, F1-score, ROC-AUC and PR-AUC
 - Logistic Regression baseline notebook
 - Decision Tree baseline and tuning notebook
+- Random Forest baseline, tuning, feature-importance and feature-ablation notebook
 
 ## Current Status
 
