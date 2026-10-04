@@ -22,11 +22,7 @@ Remaining project work:
 
 ## Dataset
 
-Raw dataset:
-
-```text
-data/raw/hotel_booking.csv
-```
+Raw dataset is stored in the raw data folder.
 
 Target variable:
 
@@ -53,11 +49,7 @@ Cleaned dataset size:
 119,205 rows x 36 columns
 ```
 
-Feature-engineered dataset:
-
-```text
-data/processed/hotel_booking_features.csv
-```
+Feature-engineered dataset is stored in the processed data folder.
 
 ## Repository Structure
 
@@ -65,8 +57,7 @@ data/processed/hotel_booking_features.csv
 IT3051-FDM-Mini-Project-2026/
 |-- 01_Dataset_Understanding/
 |   |-- Dataset_Selection_and_Understanding.ipynb
-|   |-- data_dictionary.csv
-|   `-- dataset_characteristics_summary.csv
+|   `-- generated summary tables
 |-- 02_EDA/
 |   |-- EDA.ipynb
 |   `-- Figures/
@@ -75,35 +66,25 @@ IT3051-FDM-Mini-Project-2026/
 |       `-- stay_reservation/
 |-- 03_Data_Preprocessing/
 |   |-- Data_Preprocessing.ipynb
-|   |-- cleaning_validation.csv
-|   |-- data_quality_report.csv
-|   |-- outlier_review.csv
-|   |-- preprocessing_summary.csv
-|   |-- removed_rows.csv
-|   |-- schema_report.csv
-|   `-- target_distribution_comparison.csv
+|   `-- generated cleaning reports
 |-- 04_Feature_Engineering/
 |   |-- Feature_Engineering_and_Selection.ipynb
-|   |-- encoding_strategy.csv
-|   |-- engineered_feature_evaluation.csv
-|   |-- feature_engineering_validation.csv
-|   |-- feature_selection_decisions.csv
-|   |-- feature_type_review.csv
-|   `-- final_selected_features.csv
+|   `-- generated feature reports
 |-- 05_ML_Data_Preparation/
 |   |-- ML_Data_Preparation_and_Final_Validation.ipynb
-|   `-- data_quality_report.csv
+|   `-- generated validation report
 |-- 06_Model_Evaluation/
 |   |-- Shared_Model_Setup.ipynb
 |   |-- Logistic_Regression.ipynb
 |   |-- Decision_Tree.ipynb
-|   `-- Random_Forest.ipynb
+|   |-- Random_Forest.ipynb
+|   |-- Gradient_Boosting.ipynb
+|   `-- Overall_Model_Comparison_and_Final_Selection.ipynb
 |-- data/
 |   |-- raw/
-|   |   `-- hotel_booking.csv
+|   |   `-- raw dataset
 |   `-- processed/
-|       |-- hotel_booking_cleaned.csv
-|       `-- hotel_booking_features.csv
+|       `-- processed datasets
 |-- scripts/
 |   |-- clean_hotel_bookings.py
 |   |-- feature_engineering_hotel_bookings.py
@@ -146,12 +127,7 @@ This section covers:
 - Data-leakage discussion
 - Dataset suitability conclusion
 
-Supporting files:
-
-```text
-01_Dataset_Understanding/data_dictionary.csv
-01_Dataset_Understanding/dataset_characteristics_summary.csv
-```
+Supporting summary tables are generated in the dataset-understanding folder.
 
 ### 2. Exploratory Data Analysis
 
@@ -191,11 +167,7 @@ Script:
 scripts/clean_hotel_bookings.py
 ```
 
-Output dataset:
-
-```text
-data/processed/hotel_booking_cleaned.csv
-```
+Output dataset is saved in the processed data folder.
 
 Main cleaning decisions:
 
@@ -208,17 +180,7 @@ Main cleaning decisions:
 - Retained valid extreme values and unusual observations when there was no strong evidence of error.
 - Preserved the target labels for retained rows.
 
-Generated reports:
-
-```text
-03_Data_Preprocessing/data_quality_report.csv
-03_Data_Preprocessing/preprocessing_summary.csv
-03_Data_Preprocessing/cleaning_validation.csv
-03_Data_Preprocessing/schema_report.csv
-03_Data_Preprocessing/outlier_review.csv
-03_Data_Preprocessing/removed_rows.csv
-03_Data_Preprocessing/target_distribution_comparison.csv
-```
+Generated cleaning reports are saved in the preprocessing folder.
 
 ### 4. Feature Engineering and Selection
 
@@ -235,11 +197,7 @@ scripts/feature_engineering_hotel_bookings.py
 scripts/generate_feature_engineering.py
 ```
 
-Output dataset:
-
-```text
-data/processed/hotel_booking_features.csv
-```
+Output dataset is saved in the processed data folder.
 
 Engineered features:
 
@@ -264,16 +222,7 @@ Final selected predictor count:
 32 predictors before encoding
 ```
 
-Generated reports:
-
-```text
-04_Feature_Engineering/feature_type_review.csv
-04_Feature_Engineering/engineered_feature_evaluation.csv
-04_Feature_Engineering/feature_selection_decisions.csv
-04_Feature_Engineering/final_selected_features.csv
-04_Feature_Engineering/encoding_strategy.csv
-04_Feature_Engineering/feature_engineering_validation.csv
-```
+Generated feature reports are saved in the feature-engineering folder.
 
 ### 5. ML Data Preparation and Final Validation
 
@@ -283,11 +232,7 @@ Notebook:
 05_ML_Data_Preparation/ML_Data_Preparation_and_Final_Validation.ipynb
 ```
 
-Input dataset:
-
-```text
-data/processed/hotel_booking_features.csv
-```
+Input dataset is loaded from the processed data folder.
 
 Current ML preparation summary:
 
@@ -315,11 +260,7 @@ Validation checks confirmed:
 - No excluded leakage fields among predictors.
 - Train/test split and transformed feature counts were recorded.
 
-Generated report:
-
-```text
-05_ML_Data_Preparation/data_quality_report.csv
-```
+The generated validation report is saved in the ML data preparation folder.
 
 ### 6. Model Development and Evaluation
 
@@ -335,6 +276,8 @@ Model notebooks:
 06_Model_Evaluation/Logistic_Regression.ipynb
 06_Model_Evaluation/Decision_Tree.ipynb
 06_Model_Evaluation/Random_Forest.ipynb
+06_Model_Evaluation/Gradient_Boosting.ipynb
+06_Model_Evaluation/Overall_Model_Comparison_and_Final_Selection.ipynb
 ```
 
 Shared utility script:
@@ -345,7 +288,7 @@ scripts/model_evaluation_utils.py
 
 Completed modelling setup includes:
 
-- Shared train/test split from `hotel_booking_features.csv`
+- Shared train/test split from the feature-engineered dataset
 - Shared preprocessing pipeline
 - Shared `random_state`
 - Stratified K-Fold cross-validation
@@ -353,10 +296,25 @@ Completed modelling setup includes:
 - Logistic Regression baseline, class-weighted model and coefficient interpretation notebook
 - Decision Tree baseline and tuning notebook
 - Random Forest baseline, tuning, feature-importance and feature-ablation notebook
+- Gradient Boosting baseline and tuning notebook
+- Overall model comparison and final model selection notebook
+
+Final selected model:
+
+```text
+Tuned Random Forest
+```
+
+Final selection basis:
+
+- Highest cross-validation F1-score among the compared models.
+- Strong held-out test performance across F1-score, ROC-AUC and PR-AUC.
+- Improved recall compared with the baseline Random Forest while keeping accuracy stable.
+- Feature ablation showed that removing selected calendar fields did not improve the model, so the full selected feature set was retained.
 
 ## Current Status
 
-The project has completed dataset preparation, model training, model evaluation and final model selection. The remaining work is to prepare the final report and presentation using the generated notebooks, figures and comparison tables.
+The project has completed dataset preparation, model training, model evaluation, model optimization and final model selection. The remaining work is to prepare the final report and presentation using the generated notebooks, figures and comparison tables.
 
 ## Setup
 
@@ -457,12 +415,12 @@ from pathlib import Path
 ROOT = next(
     path
     for path in [Path.cwd(), *Path.cwd().parents]
-    if (path / "data/raw/hotel_booking.csv").is_file()
+    if (path / "data" / "raw").is_dir()
 )
 
-DATA_PATH = ROOT / "data" / "raw" / "hotel_booking.csv"
+DATA_PATH = ROOT / "data" / "raw" / "<dataset-file>"
 ```
 
 ## Notes
 
-The current repository contains an older script, `scripts/preprocess_hotel_bookings.py`, and related tests that were written for a previous preprocessing-only workflow. The current staged workflow uses `hotel_booking_features.csv` as the handoff to ML data preparation, so these older preprocessing utilities should be reviewed before final submission.
+The current repository contains an older script, `scripts/preprocess_hotel_bookings.py`, and related tests that were written for a previous preprocessing-only workflow. The current staged workflow uses the feature-engineered dataset as the handoff to ML data preparation, so these older preprocessing utilities should be reviewed before final submission.
