@@ -102,6 +102,16 @@ def build_shared_setup() -> nbformat.NotebookNode:
     Numeric fields are robust-scaled. Low-cardinality categorical fields are
     one-hot encoded. High-cardinality fields (`country`, `agent`, `company`) use
     infrequent-category grouping learned from the training data only.
+
+    Shared preprocessing is used so that every model receives the same input
+    treatment before training. Numerical predictors are scaled with the same
+    robust-scaling process, categorical predictors are encoded with the same
+    one-hot encoding process, and high-cardinality fields are grouped using the
+    same training-data rules. Because these steps are kept inside the modelling
+    pipeline, each cross-validation fold learns preprocessing only from its own
+    training split. This helps prevent data leakage and keeps the comparison
+    between Logistic Regression, Decision Tree, Random Forest and Gradient
+    Boosting consistent.
     """)
     add_code(cells, """
     preprocessor = build_preprocessor(prepared.X_train)
@@ -110,7 +120,32 @@ def build_shared_setup() -> nbformat.NotebookNode:
     print(preprocessor)
     print(f"Sample transformed shape: {transformed_sample.shape}")
     """)
-    add_markdown(cells, "## 4. Cross-Validation and Metrics")
+    add_markdown(cells, """
+    ## 4. Cross-Validation and Metrics
+
+    Stratified K-Fold cross-validation is used on the training data. The
+    stratified split keeps the cancelled and not-cancelled class proportions
+    balanced across folds, while evaluating each model across multiple
+    training/validation folds gives a more stable estimate than a single
+    validation split. The held-out test set remains separate and is used only
+    for final reporting after model selection.
+
+    The common metrics describe different parts of the cancellation prediction
+    problem:
+
+    - Accuracy measures the overall proportion of correct predictions.
+    - Precision measures how many predicted cancellations were actually
+      cancelled bookings, which helps understand false cancellation alerts.
+    - Recall measures how many actual cancellations were correctly detected,
+      which helps understand missed cancellations.
+    - F1-score combines precision and recall into one balanced metric and is
+      used as the main comparison metric because cancellation prediction needs
+      both correct alerts and good cancellation coverage.
+    - ROC-AUC measures how well the model separates cancelled and not-cancelled
+      bookings across classification thresholds.
+    - PR-AUC measures precision-recall ranking quality and is useful when
+      focusing on the cancelled-booking class.
+    """)
     add_code(cells, """
     cv = get_cv()
     print(cv)
