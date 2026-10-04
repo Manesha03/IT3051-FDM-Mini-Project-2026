@@ -131,7 +131,9 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     Logistic Regression is used as a simple baseline because it is interpretable
     and works well with scaled numeric features and one-hot encoded categories.
     """)
-    add_code(cells, shared_import_cell() + """
+    add_code(cells, """
+    # pyright: reportUnusedImport=false
+    """ + shared_import_cell() + """
 
     import pandas as pd
     import numpy as np
@@ -156,7 +158,14 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     FIGURE_DIR = OUTPUT_DIR / "Figures"
     FIGURE_DIR.mkdir(parents=True, exist_ok=True)
     """)
-    add_markdown(cells, "## 1. Load Shared Data Split")
+    add_markdown(cells, """
+    ## 1. Load Shared Data Split
+
+    This section loads the final feature-engineered dataset and applies the
+    same train/test split used by the other model notebooks. The class
+    distribution is shown first so the later precision, recall and F1 results
+    can be interpreted in relation to the cancellation imbalance.
+    """)
     add_code(cells, """
     data = load_feature_dataset()
     prepared = split_feature_dataset(data)
@@ -170,7 +179,14 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     print("\\nTest class distribution")
     display(class_distribution(prepared.y_test))
     """)
-    add_markdown(cells, "## 2. Class Imbalance Review")
+    add_markdown(cells, """
+    ## 2. Class Imbalance Review
+
+    This checks how many bookings belong to each target class. Because cancelled
+    bookings are the minority class, the notebook calculates the balanced class
+    weights that can make Logistic Regression pay more attention to cancelled
+    cases during training.
+    """)
     add_code(cells, """
     training_distribution = class_distribution(prepared.y_train)
     negative_count = int((prepared.y_train == 0).sum())
@@ -186,7 +202,13 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     print(class_weights)
     display(training_distribution)
     """)
-    add_markdown(cells, "## 3. Baseline Model")
+    add_markdown(cells, """
+    ## 3. Baseline Model
+
+    The baseline model uses standard Logistic Regression without class
+    weighting. It gives a simple linear benchmark, showing how well the shared
+    predictors work before adding imbalance handling or hyperparameter tuning.
+    """)
     add_code(cells, """
     logistic_model = LogisticRegression(
         max_iter=1000,
@@ -196,7 +218,14 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     logistic_pipeline = build_pipeline(logistic_model, prepared.X_train)
     logistic_pipeline
     """)
-    add_markdown(cells, "## 4. Baseline Cross-Validation")
+    add_markdown(cells, """
+    ## 4. Baseline Cross-Validation
+
+    Cross-validation evaluates the baseline on several training folds before
+    touching the final test set. This helps estimate how stable the model is and
+    whether its validation performance is strong enough to compare with more
+    complex models.
+    """)
     add_code(cells, """
     logistic_cv = cross_validation_summary(
         "Logistic Regression",
@@ -214,7 +243,13 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     generalization before looking at the final test set. A small gap between
     training and validation scores indicates limited overfitting.
     """)
-    add_markdown(cells, "## 5. Baseline Final Test Evaluation")
+    add_markdown(cells, """
+    ## 5. Baseline Final Test Evaluation
+
+    This evaluates the fitted baseline on the untouched test set. These results
+    show how the simple Logistic Regression model performs on unseen bookings
+    after model selection decisions were made using training data only.
+    """)
     add_code(cells, """
     logistic_pipeline, logistic_test = fit_and_evaluate(
         "Logistic Regression",
@@ -233,13 +268,25 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     as a stable and interpretable baseline, but its recall should be checked
     carefully because low recall means more actual cancellations are missed.
     """)
-    add_markdown(cells, "## 6. Baseline Confusion Matrix")
+    add_markdown(cells, """
+    ## 6. Baseline Confusion Matrix
+
+    The confusion matrix shows the actual error counts behind the summary
+    metrics. It makes clear how many cancelled bookings were missed and how many
+    non-cancelled bookings were incorrectly flagged as cancellations.
+    """)
     add_code(cells, """
     logistic_predictions = logistic_pipeline.predict(prepared.X_test)
     logistic_confusion = confusion_matrix_frame(prepared.y_test, logistic_predictions)
     display(logistic_confusion)
     """)
-    add_markdown(cells, "## 7. Class-Weighted Logistic Regression")
+    add_markdown(cells, """
+    ## 7. Class-Weighted Logistic Regression
+
+    This model adds balanced class weighting to reduce the effect of class
+    imbalance. The aim is to improve recall for cancelled bookings by making
+    mistakes on the minority class more costly during training.
+    """)
     add_code(cells, """
     weighted_logistic_model = LogisticRegression(
         max_iter=1000,
@@ -250,7 +297,13 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     weighted_logistic_pipeline = build_pipeline(weighted_logistic_model, prepared.X_train)
     weighted_logistic_pipeline
     """)
-    add_markdown(cells, "## 8. Class-Weighted Cross-Validation")
+    add_markdown(cells, """
+    ## 8. Class-Weighted Cross-Validation
+
+    Cross-validation checks whether class weighting consistently improves the
+    training-fold results. This section is mainly used to compare recall and F1
+    against the baseline model.
+    """)
     add_code(cells, """
     weighted_logistic_cv = cross_validation_summary(
         "Logistic Regression",
@@ -261,7 +314,13 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     )
     display(weighted_logistic_cv.round(4))
     """)
-    add_markdown(cells, "## 9. Class-Weighted Final Test Evaluation")
+    add_markdown(cells, """
+    ## 9. Class-Weighted Final Test Evaluation
+
+    This applies the class-weighted model to the final test set. The result
+    shows whether the expected recall improvement also appears on unseen data,
+    and whether precision drops as a trade-off.
+    """)
     add_code(cells, """
     weighted_logistic_pipeline, weighted_logistic_test = fit_and_evaluate(
         "Logistic Regression",
@@ -273,13 +332,25 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     weighted_logistic_test_results = pd.DataFrame([weighted_logistic_test])
     display(weighted_logistic_test_results.round(4))
     """)
-    add_markdown(cells, "## 10. Class-Weighted Confusion Matrix")
+    add_markdown(cells, """
+    ## 10. Class-Weighted Confusion Matrix
+
+    This confusion matrix explains the effect of class weighting in concrete
+    counts. It shows whether the model caught more actual cancellations and how
+    many extra false cancellation predictions were created.
+    """)
     add_code(cells, """
     weighted_logistic_predictions = weighted_logistic_pipeline.predict(prepared.X_test)
     weighted_logistic_confusion = confusion_matrix_frame(prepared.y_test, weighted_logistic_predictions)
     display(weighted_logistic_confusion)
     """)
-    add_markdown(cells, "## 11. Baseline vs Class-Weighted Comparison")
+    add_markdown(cells, """
+    ## 11. Baseline vs Class-Weighted Comparison
+
+    This table places the baseline and class-weighted models side by side. The
+    purpose is to decide whether the recall gain from class weighting is worth
+    the precision loss for the hotel cancellation problem.
+    """)
     add_code(cells, """
     logistic_test_results = pd.DataFrame([
         logistic_test,
@@ -343,7 +414,13 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     whether recall gains justify the precision trade-off for the cancellation
     class.
     """)
-    add_markdown(cells, "## 13. Tuned Cross-Validation")
+    add_markdown(cells, """
+    ## 13. Tuned Cross-Validation
+
+    The best grid-search model is rechecked with the common cross-validation
+    summary. This confirms whether the selected settings give stable F1,
+    precision and recall compared with the earlier versions.
+    """)
     add_code(cells, """
     tuned_logistic_pipeline = logistic_search.best_estimator_
 
@@ -356,7 +433,13 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     )
     display(tuned_logistic_cv.round(4))
     """)
-    add_markdown(cells, "## 14. Tuned Final Test Evaluation")
+    add_markdown(cells, """
+    ## 14. Tuned Final Test Evaluation
+
+    This section evaluates the tuned model on the untouched test set. It shows
+    whether the best cross-validation configuration still performs well when
+    applied to bookings that were not used during tuning.
+    """)
     add_code(cells, """
     tuned_logistic_pipeline, tuned_logistic_test = fit_and_evaluate(
         "Logistic Regression",
@@ -368,13 +451,25 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     tuned_logistic_test_results = pd.DataFrame([tuned_logistic_test])
     display(tuned_logistic_test_results.round(4))
     """)
-    add_markdown(cells, "## 15. Tuned Confusion Matrix")
+    add_markdown(cells, """
+    ## 15. Tuned Confusion Matrix
+
+    The tuned confusion matrix shows the final error pattern for Logistic
+    Regression. It helps explain whether tuning mainly changed missed
+    cancellations, false alarms, or both.
+    """)
     add_code(cells, """
     tuned_logistic_predictions = tuned_logistic_pipeline.predict(prepared.X_test)
     tuned_logistic_confusion = confusion_matrix_frame(prepared.y_test, tuned_logistic_predictions)
     display(tuned_logistic_confusion)
     """)
-    add_markdown(cells, "## 16. Baseline vs Class-Weighted vs Tuned Comparison")
+    add_markdown(cells, """
+    ## 16. Baseline vs Class-Weighted vs Tuned Comparison
+
+    This combined comparison summarizes all Logistic Regression versions. It is
+    used to identify the most useful version and to explain why the selected
+    version performs better or differently from the simple baseline.
+    """)
     add_code(cells, """
     logistic_test_results = pd.DataFrame([
         logistic_test,
@@ -398,7 +493,13 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     If it selects no class weighting, that means the extra recall was not worth
     the precision loss under the F1 objective.
     """)
-    add_markdown(cells, "## 17. Coefficients and Odds Ratios")
+    add_markdown(cells, """
+    ## 17. Coefficients and Odds Ratios
+
+    Logistic Regression is interpretable, so this section converts fitted
+    coefficients into odds ratios. These values explain which encoded predictors
+    increase or decrease the estimated chance of cancellation.
+    """)
     add_code(cells, """
     def coefficient_table(pipeline, version, top_n=15):
         feature_names = pipeline.named_steps["preprocessor"].get_feature_names_out()
@@ -434,7 +535,13 @@ def build_logistic_regression() -> nbformat.NotebookNode:
     coefficient table explains which variables remain most influential after
     the selected regularization and weighting choices.
     """)
-    add_markdown(cells, "## 18. ROC and Precision-Recall Curves")
+    add_markdown(cells, """
+    ## 18. ROC and Precision-Recall Curves
+
+    These curves compare the ranking ability of the Logistic Regression
+    versions across different thresholds. ROC curves show overall separation,
+    while precision-recall curves are especially useful for the cancelled class.
+    """)
     add_code(cells, """
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
     RocCurveDisplay.from_estimator(logistic_pipeline, prepared.X_test, prepared.y_test, ax=axes[0], name="Baseline")
@@ -495,7 +602,13 @@ def build_decision_tree() -> nbformat.NotebookNode:
     FIGURE_DIR = OUTPUT_DIR / "Figures"
     FIGURE_DIR.mkdir(parents=True, exist_ok=True)
     """)
-    add_markdown(cells, "## 1. Load Shared Data Split")
+    add_markdown(cells, """
+    ## 1. Load Shared Data Split
+
+    This section loads the same feature-engineered dataset and train/test split
+    used by the other model notebooks. The class distribution is displayed so
+    the tree results can be read with the cancellation imbalance in mind.
+    """)
     add_code(cells, """
     data = load_feature_dataset()
     prepared = split_feature_dataset(data)
@@ -509,13 +622,25 @@ def build_decision_tree() -> nbformat.NotebookNode:
     print("\\nTest class distribution")
     display(class_distribution(prepared.y_test))
     """)
-    add_markdown(cells, "## 2. Baseline Decision Tree")
+    add_markdown(cells, """
+    ## 2. Baseline Decision Tree
+
+    The baseline tree is created with default depth settings. This gives an
+    intentionally flexible model so we can see how well a single tree fits the
+    data before pruning or limiting its complexity.
+    """)
     add_code(cells, """
     tree_model = DecisionTreeClassifier(random_state=RANDOM_STATE)
     tree_pipeline = build_pipeline(tree_model, prepared.X_train)
     tree_pipeline
     """)
-    add_markdown(cells, "## 3. Baseline Cross-Validation")
+    add_markdown(cells, """
+    ## 3. Baseline Cross-Validation
+
+    Cross-validation tests the baseline tree on repeated training folds. The
+    train-versus-validation gap is important here because unrestricted decision
+    trees often overfit by memorizing detailed patterns in the training data.
+    """)
     add_code(cells, """
     tree_cv = cross_validation_summary(
         "Decision Tree",
@@ -538,7 +663,13 @@ def build_decision_tree() -> nbformat.NotebookNode:
     data. The train-vs-CV gap table is used to check overfitting. A large gap,
     especially for F1, suggests that the baseline tree is too complex.
     """)
-    add_markdown(cells, "## 4. Baseline Final Test Evaluation")
+    add_markdown(cells, """
+    ## 4. Baseline Final Test Evaluation
+
+    This evaluates the baseline tree on the untouched test set. The result
+    shows whether the high flexibility of the tree actually generalizes to new
+    bookings or mainly helped on the training folds.
+    """)
     add_code(cells, """
     tree_pipeline, tree_test = fit_and_evaluate(
         "Decision Tree",
@@ -550,7 +681,13 @@ def build_decision_tree() -> nbformat.NotebookNode:
     tree_test_results = pd.DataFrame([tree_test])
     display(tree_test_results.round(4))
     """)
-    add_markdown(cells, "## 5. Baseline Confusion Matrix")
+    add_markdown(cells, """
+    ## 5. Baseline Confusion Matrix
+
+    The baseline confusion matrix shows the actual prediction mistakes. It
+    explains how many cancellations the tree missed and how many non-cancelled
+    bookings it incorrectly predicted as cancelled.
+    """)
     add_code(cells, """
     tree_predictions = tree_pipeline.predict(prepared.X_test)
     tree_confusion = confusion_matrix_frame(prepared.y_test, tree_predictions)
@@ -598,7 +735,13 @@ def build_decision_tree() -> nbformat.NotebookNode:
     reported to understand ranking and probability discrimination beyond one
     fixed threshold.
     """)
-    add_markdown(cells, "## 7. Tuned Cross-Validation")
+    add_markdown(cells, """
+    ## 7. Tuned Cross-Validation
+
+    The best tree from grid search is evaluated with the same cross-validation
+    summary. The goal is to check whether limiting depth and leaf sizes reduces
+    overfitting while keeping useful cancellation prediction performance.
+    """)
     add_code(cells, """
     tuned_tree_pipeline = tree_search.best_estimator_
 
@@ -623,7 +766,13 @@ def build_decision_tree() -> nbformat.NotebookNode:
     desirable when the baseline has a large train-vs-CV gap. The important
     question is whether validation and test performance become more reliable.
     """)
-    add_markdown(cells, "## 8. Tuned Final Test Evaluation")
+    add_markdown(cells, """
+    ## 8. Tuned Final Test Evaluation
+
+    This applies the tuned tree to the final test set. It shows whether the
+    simpler tree structure chosen during tuning gives more reliable performance
+    on unseen bookings.
+    """)
     add_code(cells, """
     tuned_tree_pipeline, tuned_tree_test = fit_and_evaluate(
         "Decision Tree",
@@ -635,13 +784,25 @@ def build_decision_tree() -> nbformat.NotebookNode:
     tuned_tree_test_results = pd.DataFrame([tuned_tree_test])
     display(tuned_tree_test_results.round(4))
     """)
-    add_markdown(cells, "## 9. Tuned Confusion Matrix")
+    add_markdown(cells, """
+    ## 9. Tuned Confusion Matrix
+
+    The tuned confusion matrix shows how pruning-style constraints changed the
+    actual errors. It helps explain whether tuning reduced false positives,
+    false negatives, or both.
+    """)
     add_code(cells, """
     tuned_tree_predictions = tuned_tree_pipeline.predict(prepared.X_test)
     tuned_tree_confusion = confusion_matrix_frame(prepared.y_test, tuned_tree_predictions)
     display(tuned_tree_confusion)
     """)
-    add_markdown(cells, "## 10. Baseline vs Tuned Comparison")
+    add_markdown(cells, """
+    ## 10. Baseline vs Tuned Comparison
+
+    This comparison places the unrestricted tree and tuned tree side by side.
+    It is used to decide whether reduced overfitting and better ranking metrics
+    are worth any change in default-threshold F1, precision or recall.
+    """)
     add_code(cells, """
     decision_tree_test_results = pd.DataFrame([
         tree_test,
@@ -669,7 +830,13 @@ def build_decision_tree() -> nbformat.NotebookNode:
     while the default-threshold F1 did not improve. This trade-off is important
     for the final model comparison.
     """)
-    add_markdown(cells, "## 11. ROC and Precision-Recall Curves")
+    add_markdown(cells, """
+    ## 11. ROC and Precision-Recall Curves
+
+    These curves show how the tuned tree separates cancelled and non-cancelled
+    bookings across thresholds. Precision-recall is especially useful because
+    the cancellation class is smaller than the non-cancellation class.
+    """)
     add_code(cells, """
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
     RocCurveDisplay.from_estimator(tuned_tree_pipeline, prepared.X_test, prepared.y_test, ax=axes[0])
@@ -680,7 +847,13 @@ def build_decision_tree() -> nbformat.NotebookNode:
     plt.savefig(FIGURE_DIR / "decision_tree_curves.png", dpi=300, bbox_inches="tight")
     plt.show()
     """)
-    add_markdown(cells, "## 12. Tree Visualization")
+    add_markdown(cells, """
+    ## 12. Tree Visualization
+
+    This visualizes the first levels of the tuned decision tree. It helps make
+    the model explainable by showing the early split rules that guide the most
+    important prediction paths.
+    """)
     add_code(cells, """
     fitted_tree = tuned_tree_pipeline.named_steps["model"]
 
