@@ -3,3 +3,4 @@ __pycache__/
 .ipynb_checkpoints/
 .jupyter_runtime/
 .ipython/
+06_Model_Evaluation/*.csv

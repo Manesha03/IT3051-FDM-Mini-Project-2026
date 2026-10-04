@@ -1,7 +1,7 @@
 {
   "model": "Random Forest",
   "version": "Tuned",
-  "selection_status": "Recommended; pending group approval",
+  "selection_status": "Selected final model",
   "parameters": {
     "n_estimators": 100,
     "max_depth": 28,
