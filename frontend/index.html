@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hotel Cancellation Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <img class="brand-logo" src="assets/luxury-hotel-logo.svg" alt="Hotel booking logo">
+        <div>
+          <strong>Hotel Booking</strong>
+          <small>Risk Dashboard</small>
+        </div>
+      </div>
+      <nav>
+        <button class="nav-link active" data-section="overview">Dashboard</button>
+        <button class="nav-link" data-section="prediction">Check a Booking</button>
+        <button class="nav-link" data-section="insights">Booking Trends</button>
+        <button class="nav-link" data-section="recommendations">Recommendations</button>
+        <button class="nav-link" data-section="model">System Details</button>
+      </nav>
+    </aside>
+
+    <main class="dashboard">
+      <header class="topbar">
+        <div>
+          <h1>Hotel Booking Cancellation Dashboard</h1>
+          <p class="topbar-subtitle">Review booking risk, understand cancellation trends, and check new reservations.</p>
+        </div>
+        <div class="status" id="status">Checking API...</div>
+      </header>
+
+      <section class="section active" id="section-overview">
+        <div class="kpi-grid" id="kpi-grid"></div>
+        <div class="chart-grid overview-grid">
+          <article class="card chart-card">
+            <h2>Cancellation Split</h2>
+            <p class="card-help">How many past bookings were cancelled compared with completed stays.</p>
+            <div id="targetChart" class="viz donut-wrap"></div>
+          </article>
+          <article class="card chart-card">
+            <h2>Bookings by Hotel Type</h2>
+            <p class="card-help">Booking volume for city and resort hotel reservations.</p>
+            <div id="hotelChart" class="viz column-chart"></div>
+          </article>
+          <article class="card chart-card wide">
+            <h2>Customer Type Risk</h2>
+            <p class="card-help">Guest categories with higher cancellation percentages.</p>
+            <div id="customerChart" class="viz risk-grid"></div>
+          </article>
+          <article class="card chart-card wide">
+            <h2>Cancellation Rate by Arrival Month</h2>
+            <p class="card-help">Months with higher percentages need closer follow-up before arrival.</p>
+            <div id="monthChart" class="viz bars horizontal"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="section-prediction">
+        <div class="split">
+          <form class="card form" id="prediction-form" novalidate>
+            <div class="form-heading">
+              <h2>Check a Booking</h2>
+              <p>Enter the booking details to estimate whether this guest may cancel.</p>
+            </div>
+
+            <div class="stepper" aria-label="Booking prediction steps">
+              <span class="step-dot active" data-step-label="1">Reservation and Stay</span>
+              <span class="step-dot" data-step-label="2">Booking and Price</span>
+            </div>
+
+            <div class="form-step active" data-step="1">
+            <fieldset>
+              <legend>Reservation</legend>
+              <div class="grid">
+                <label>Hotel<select name="hotel" required></select></label>
+                <label>Arrival year<input name="arrival_date_year" type="number" min="2015" max="2035" value="2026" required></label>
+                <label>Arrival month<select name="arrival_date_month" required></select></label>
+                <label>Week number<input name="arrival_date_week_number" type="number" min="1" max="53" value="28" required></label>
+                <label>Day of month<input name="arrival_date_day_of_month" type="number" min="1" max="31" value="12" required></label>
+                <label>Lead time<input name="lead_time" type="number" min="0" max="1000" value="80" required></label>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Stay and Guests</legend>
+              <div class="grid">
+                <label>Weekend nights<input name="stays_in_weekend_nights" type="number" min="0" max="30" value="1" required></label>
+                <label>Week nights<input name="stays_in_week_nights" type="number" min="0" max="60" value="2" required></label>
+                <label>Adults<input name="adults" type="number" min="0" max="20" value="2" required></label>
+                <label>Children<input name="children" type="number" min="0" max="20" value="0" required></label>
+                <label>Babies<input name="babies" type="number" min="0" max="10" value="0" required></label>
+                <label>Room type<select name="reserved_room_type" required></select></label>
+              </div>
+            </fieldset>
+            </div>
+
+            <div class="form-step" data-step="2">
+            <fieldset>
+              <legend>Booking Details</legend>
+              <div class="grid">
+                <label>Meal<select name="meal" required></select></label>
+                <label>Country<select name="country" required></select></label>
+                <label>Market segment<select name="market_segment" required></select></label>
+                <label>Distribution channel<select name="distribution_channel" required></select></label>
+                <label>Deposit type<select name="deposit_type" required></select></label>
+                <label>Customer type<select name="customer_type" required></select></label>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>History and Price</legend>
+              <div class="grid">
+                <label>Repeated guest<select name="is_repeated_guest" required><option value="0">No</option><option value="1">Yes</option></select></label>
+                <label>Previous cancellations<input name="previous_cancellations" type="number" min="0" max="100" value="0" required></label>
+                <label>Previous non-cancelled bookings<input name="previous_bookings_not_canceled" type="number" min="0" max="100" value="0" required></label>
+                <label>ADR<input name="adr" type="number" min="0" max="10000" step="0.01" value="95" required></label>
+                <label>Parking spaces<input name="required_car_parking_spaces" type="number" min="0" max="10" value="0" required></label>
+                <label>Special requests<input name="total_of_special_requests" type="number" min="0" max="10" value="1" required></label>
+                <label>Agent ID<select name="agent" required></select></label>
+                <label>Company ID<select name="company" required></select></label>
+              </div>
+            </fieldset>
+            </div>
+
+            <div class="actions">
+              <button type="button" class="secondary" id="prev-step">Back</button>
+              <button type="button" id="next-step">Next</button>
+              <button type="submit" id="predict-button">Predict Cancellation</button>
+              <button type="reset" class="secondary">Reset</button>
+            </div>
+          </form>
+          <aside class="card result" id="result" aria-live="polite">
+            <h2>Prediction Result</h2>
+            <p class="muted">The cancellation risk will appear here after you submit a booking.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section" id="section-insights">
+        <div class="chart-grid">
+          <article class="card chart-card">
+            <h2>Market Segment Risk</h2>
+            <p class="card-help">Channels with higher cancellation percentages.</p>
+            <div id="marketChart" class="viz bubble-chart"></div>
+          </article>
+          <article class="card chart-card">
+            <h2>Deposit Type Risk</h2>
+            <p class="card-help">How deposit policies relate to cancellations.</p>
+            <div id="depositChart" class="viz pie-wrap"></div>
+          </article>
+          <article class="card chart-card">
+            <h2>Lead Time Risk</h2>
+            <p class="card-help">Risk changes based on how early the booking was made.</p>
+            <div id="leadTimeChart" class="viz line-chart"></div>
+          </article>
+          <article class="card chart-card">
+            <h2>Top Country Risk</h2>
+            <p class="card-help">Main guest countries ranked by cancellation percentage.</p>
+            <div id="countryChart" class="viz bars horizontal"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="section-recommendations">
+        <div class="recommendation-layout">
+          <article class="card recommendation-hero">
+            <div>
+              <h2>Reservation Action Center</h2>
+              <p>Use these actions to reduce avoidable cancellations and decide which bookings need follow-up first.</p>
+            </div>
+            <div class="hero-meter">
+              <strong>3-step</strong>
+              <span>review plan</span>
+            </div>
+          </article>
+          <article class="action-summary wide">
+            <div><strong>High</strong><span>Call guest and confirm arrival</span></div>
+            <div><strong>Medium</strong><span>Send reminder or payment note</span></div>
+            <div><strong>Low</strong><span>Continue normal process</span></div>
+          </article>
+          <article class="card wide">
+            <h2>Recommended Actions</h2>
+            <div id="recommendation-list" class="recommendation-grid"></div>
+          </article>
+          <article class="card wide">
+            <h2>Suggested Daily Workflow</h2>
+            <ol class="timeline">
+              <li><strong>Morning:</strong> Check new bookings and flag high-risk reservations.</li>
+              <li><strong>Before arrival:</strong> Contact guests with high estimated cancellation chance.</li>
+              <li><strong>Weekly:</strong> Review trends by segment, deposit type, and country.</li>
+              <li><strong>Monthly:</strong> Discuss risk patterns with management and adjust follow-up rules.</li>
+            </ol>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="section-model">
+        <div class="model-grid">
+          <article class="card">
+            <h2>System Summary</h2>
+            <dl id="model-summary"></dl>
+          </article>
+          <article class="card chart-card">
+            <h2>What Influences Cancellation Risk</h2>
+            <p class="card-help">The strongest factors used by the prediction system.</p>
+            <div id="importanceChart" class="viz bars horizontal"></div>
+          </article>
+          <article class="card wide">
+            <h2>About This System</h2>
+            <div class="system-notes">
+              <p>This dashboard helps hotel staff review cancellation patterns and estimate the cancellation risk of a new reservation.</p>
+              <p>The prediction is a decision-support tool. Staff should still use normal guest communication and hotel policy when deciding follow-up actions.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-labelledby="title desc">
+  <title id="title">Hotel booking logo</title>
+  <desc id="desc">Gold hotel emblem with roof, window and booking risk text.</desc>
+  <rect width="240" height="240" fill="#020202"/>
+  <circle cx="120" cy="112" r="83" fill="none" stroke="#d9b458" stroke-width="3"/>
+  <circle cx="120" cy="112" r="75" fill="none" stroke="#d9b458" stroke-width="1.6" stroke-dasharray="8 7"/>
+  <path d="M58 139c24-24 48-37 62-37s38 13 62 37" fill="none" stroke="#d9b458" stroke-width="4" stroke-linecap="round"/>
+  <path d="M85 110l35-27 35 27" fill="none" stroke="#f4d987" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M109 107h22v22h-22z" fill="#f4d987"/>
+  <path d="M120 107v22M109 118h22" stroke="#020202" stroke-width="3"/>
+  <path d="M45 152c35-18 57-25 75-25s40 7 75 25" fill="none" stroke="#d9b458" stroke-width="3" stroke-linecap="round"/>
+  <path d="M52 162c32-14 52-20 68-20s36 6 68 20M62 171c25-10 42-15 58-15s33 5 58 15" fill="none" stroke="#d9b458" stroke-width="2" stroke-linecap="round"/>
+  <text x="120" y="190" text-anchor="middle" fill="#f4d987" font-family="Arial, Helvetica, sans-serif" font-size="23" letter-spacing="2">HOTEL</text>
+  <text x="120" y="211" text-anchor="middle" fill="#d9b458" font-family="Arial, Helvetica, sans-serif" font-size="8" letter-spacing="1">BOOKING RISK</text>
+</svg>
