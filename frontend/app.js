@@ -231,12 +231,6 @@ function renderRiskGrid(id, rows) {
 function renderDashboard(data) {
   const { overview, charts: dashboardCharts } = data;
   renderKpis(overview);
-  document.querySelector("#model-summary").innerHTML = `
-    <dt>Prediction method</dt><dd>${overview.model}</dd>
-    <dt>Model version</dt><dd>${overview.version}</dd>
-    <dt>Booking details checked</dt><dd>${overview.predictor_count}</dd>
-    <dt>Past bookings analysed</dt><dd>${number(overview.total_bookings)}</dd>
-  `;
 
   renderDonut("targetChart", dashboardCharts.target_distribution);
   renderColumnChart("hotelChart", dashboardCharts.hotel_type);

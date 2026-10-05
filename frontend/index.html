@@ -20,7 +20,6 @@
         <button class="nav-link" data-section="prediction">Check a Booking</button>
         <button class="nav-link" data-section="insights">Booking Trends</button>
         <button class="nav-link" data-section="recommendations">Recommendations</button>
-        <button class="nav-link" data-section="model">System Details</button>
       </nav>
     </aside>
 
@@ -34,6 +33,10 @@
       </header>
 
       <section class="section active" id="section-overview">
+        <article class="page-intro">
+          <h2>Dashboard Overview</h2>
+          <p>Quickly review overall cancellation risk, booking volume, customer risk groups, and monthly cancellation patterns.</p>
+        </article>
         <div class="kpi-grid" id="kpi-grid"></div>
         <div class="chart-grid overview-grid">
           <article class="card chart-card">
@@ -60,6 +63,10 @@
       </section>
 
       <section class="section" id="section-prediction">
+        <article class="page-intro">
+          <h2>Check a Booking</h2>
+          <p>Enter reservation details in two simple steps to estimate whether a booking may be cancelled.</p>
+        </article>
         <div class="split">
           <form class="card form" id="prediction-form" novalidate>
             <div class="form-heading">
@@ -141,6 +148,10 @@
       </section>
 
       <section class="section" id="section-insights">
+        <article class="page-intro">
+          <h2>Booking Trends</h2>
+          <p>Explore which booking channels, deposit types, lead-time ranges, countries, and model factors influence cancellation risk.</p>
+        </article>
         <div class="chart-grid">
           <article class="card chart-card">
             <h2>Market Segment Risk</h2>
@@ -162,19 +173,29 @@
             <p class="card-help">Main guest countries ranked by cancellation percentage.</p>
             <div id="countryChart" class="viz bars horizontal"></div>
           </article>
+          <article class="card chart-card wide">
+            <h2>What Influences Cancellation Risk</h2>
+            <p class="card-help">The strongest factors used by the prediction system.</p>
+            <div id="importanceChart" class="viz bars horizontal"></div>
+          </article>
         </div>
       </section>
 
       <section class="section" id="section-recommendations">
+        <article class="page-intro">
+          <h2>Recommendations</h2>
+          <p>Use this page as an action guide for reducing avoidable cancellations and planning daily guest follow-up.</p>
+        </article>
         <div class="recommendation-layout">
           <article class="card recommendation-hero">
             <div>
               <h2>Reservation Action Center</h2>
               <p>Use these actions to reduce avoidable cancellations and decide which bookings need follow-up first.</p>
             </div>
-            <div class="hero-meter">
-              <strong>3-step</strong>
-              <span>review plan</span>
+            <div class="review-strip">
+              <span><strong>1</strong>Review risk</span>
+              <span><strong>2</strong>Contact guest</span>
+              <span><strong>3</strong>Update action</span>
             </div>
           </article>
           <article class="action-summary wide">
@@ -194,27 +215,6 @@
               <li><strong>Weekly:</strong> Review trends by segment, deposit type, and country.</li>
               <li><strong>Monthly:</strong> Discuss risk patterns with management and adjust follow-up rules.</li>
             </ol>
-          </article>
-        </div>
-      </section>
-
-      <section class="section" id="section-model">
-        <div class="model-grid">
-          <article class="card">
-            <h2>System Summary</h2>
-            <dl id="model-summary"></dl>
-          </article>
-          <article class="card chart-card">
-            <h2>What Influences Cancellation Risk</h2>
-            <p class="card-help">The strongest factors used by the prediction system.</p>
-            <div id="importanceChart" class="viz bars horizontal"></div>
-          </article>
-          <article class="card wide">
-            <h2>About This System</h2>
-            <div class="system-notes">
-              <p>This dashboard helps hotel staff review cancellation patterns and estimate the cancellation risk of a new reservation.</p>
-              <p>The prediction is a decision-support tool. Staff should still use normal guest communication and hotel policy when deciding follow-up actions.</p>
-            </div>
           </article>
         </div>
       </section>
