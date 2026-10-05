@@ -377,6 +377,10 @@ class RequestHandler(SimpleHTTPRequestHandler):
         if path == "/api/dashboard":
             self.send_json(dashboard_payload())
             return
+        if path == "/api/test":
+            self.path = "/api-test.html"
+            super().do_GET()
+            return
         if path == "/":
             self.path = "/index.html"
         super().do_GET()
