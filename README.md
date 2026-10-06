@@ -1,43 +1,69 @@
-# Hotel Booking Cancellation Prediction System
+<div align="center">
 
-IT3051 Fundamentals of Data Mining - Mini Project
+<h1>Hotel Booking Cancellation Prediction System</h1>
 
-This project builds an end-to-end hotel booking cancellation prediction system. It covers the full data mining workflow from dataset understanding and preprocessing to model evaluation, backend deployment, and a user-friendly dashboard for hotel staff.
+<p>
+  <strong>End-to-end machine learning system for predicting hotel booking cancellation risk.</strong>
+</p>
 
-## Project Snapshot
+<p>
+  <img src="https://img.shields.io/badge/Python-3.x-3776AB?style=flat-square&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/Pandas-Data%20Processing-150458?style=flat-square&logo=pandas&logoColor=white" />
+  <img src="https://img.shields.io/badge/Scikit--learn-Final%20Model-F7931E?style=flat-square&logo=scikitlearn&logoColor=white" />
+  <img src="https://img.shields.io/badge/Backend-Python%20API-2E8B57?style=flat-square" />
+  <img src="https://img.shields.io/badge/Frontend-Dashboard-35C9FF?style=flat-square" />
+  <img src="https://img.shields.io/badge/Tests-unittest-success?style=flat-square" />
+</p>
 
-| Area | Status | Output |
+</div>
+
+---
+
+<h2 align="center">About The Project</h2>
+
+This project builds a complete **Hotel Booking Cancellation Prediction System** for the IT3051 Fundamentals of Data Mining mini project.
+
+The system uses historical hotel booking data to estimate whether a new reservation is likely to be cancelled. It covers the full data mining workflow: dataset understanding, exploratory data analysis, preprocessing, feature engineering, model preparation, model evaluation, final model selection, backend integration, frontend development, and automated testing.
+
+The final application is designed for hotel staff who need a simple way to review cancellation risk, understand booking trends, and decide which reservations may need follow-up.
+
+---
+
+<h2 align="center">Project Snapshot</h2>
+
+| Area | Status | Main Output |
 |---|---:|---|
 | Dataset understanding | Complete | Data dictionary, quality review, suitability analysis |
-| EDA | Complete | Booking, stay, customer, commercial and distribution insights |
+| Exploratory data analysis | Complete | Booking, stay, customer, commercial and distribution insights |
 | Data preprocessing | Complete | Cleaned dataset and validation reports |
 | Feature engineering | Complete | Final selected predictor set and engineered features |
-| ML preparation | Complete | Shared train/test split and preprocessing pipeline |
+| ML data preparation | Complete | Shared train/test split and preprocessing pipeline |
 | Model evaluation | Complete | Logistic Regression, Decision Tree, Random Forest, Gradient Boosting |
 | Final model | Complete | Tuned Random Forest pipeline |
-| Backend service | Complete | Prediction API and dashboard API |
-| Frontend dashboard | Complete | Staff-facing dashboard, live prediction form and recommendations |
+| Backend service | Complete | Prediction API, schema API, dashboard API |
+| Frontend dashboard | Complete | Staff dashboard, prediction form, trends and recommendations |
+| Automated tests | Complete | Cleaning, preprocessing, inference and backend endpoint checks |
 
-## Problem Statement
+---
 
-Hotels lose revenue and operational efficiency when bookings are cancelled unexpectedly. This system estimates whether a reservation is likely to be cancelled using booking information available before the final reservation outcome.
+<h2 align="center">Problem Statement</h2>
 
-Target variable:
+Hotels lose revenue and operational efficiency when bookings are cancelled unexpectedly. This system estimates cancellation risk using booking information available before the final reservation outcome.
 
-```text
-is_canceled
-```
+| Item | Description |
+|---|---|
+| Prediction task | Binary classification |
+| Target variable | `is_canceled` |
+| Class `0` | Booking was not cancelled |
+| Class `1` | Booking was cancelled |
+| Intended user | Hotel staff or reservation managers |
+| Main output | Cancellation prediction, probability and recommended action |
 
-Target meaning:
+---
 
-```text
-0 = Booking was not cancelled
-1 = Booking was cancelled
-```
+<h2 align="center">Dataset Summary</h2>
 
-## Dataset Summary
-
-| Dataset version | Shape |
+| Dataset Version | Shape |
 |---|---:|
 | Raw dataset | 119,390 rows x 36 columns |
 | Cleaned dataset | 119,205 rows x 36 columns |
@@ -45,7 +71,84 @@ Target meaning:
 
 Raw data is stored in `data/raw/`, and processed datasets are stored in `data/processed/`.
 
-## Final Model
+---
+
+<h2 align="center">Core Features</h2>
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### Data Mining Workflow
+- Dataset understanding and data dictionary
+- Missing value, duplicate and invalid value analysis
+- Exploratory analysis of booking behaviour
+- Cleaning, type correction and validation reports
+- Feature engineering and predictor selection
+
+</td>
+<td width="50%" valign="top">
+
+### Machine Learning
+- Shared train/test split
+- Shared preprocessing pipeline
+- Logistic Regression, Decision Tree, Random Forest and Gradient Boosting
+- Hyperparameter tuning and final model comparison
+- Final selected model: Tuned Random Forest
+
+</td>
+</tr>
+
+<tr>
+<td width="50%" valign="top">
+
+### Backend Service
+- Loads final trained model and metadata
+- Accepts and validates booking inputs
+- Rebuilds required engineered features
+- Uses the saved preprocessing and model pipeline
+- Returns prediction label, probability and model details
+
+</td>
+<td width="50%" valign="top">
+
+### Frontend Dashboard
+- Staff-facing cancellation dashboard
+- Two-step prediction form
+- Input validation and dropdown options from backend schema
+- Clear prediction result with probability
+- Booking trends, model factors and recommended actions
+
+</td>
+</tr>
+
+<tr>
+<td width="50%" valign="top">
+
+### Automated Testing
+- Data-cleaning validation tests
+- Preprocessing safety tests
+- Predictor preparation checks
+- Final-model inference test
+- Backend API endpoint tests
+
+</td>
+<td width="50%" valign="top">
+
+### Evaluation Support
+- API test console at `/api/test`
+- Health endpoint for service checks
+- Schema endpoint for frontend options and ranges
+- Dashboard endpoint for KPI and chart data
+- Clear error handling for invalid requests
+
+</td>
+</tr>
+</table>
+
+---
+
+<h2 align="center">Final Model</h2>
 
 The selected production model is:
 
@@ -67,58 +170,93 @@ Saved model artifacts:
 06_Model_Evaluation/Models/tuned_random_forest_metadata.json
 ```
 
-The saved pipeline includes the trained model and preprocessing pipeline, so backend predictions use the same transformations as model development.
+The saved pipeline includes both preprocessing and the trained model, so backend predictions use the same transformations used during model development.
 
-## End-to-End Application
+---
 
-The application is split into:
+<h2 align="center">System Architecture</h2>
 
 ```text
-backend/
-frontend/
+Hotel Booking Dataset
+          |
+          v
+01_Dataset_Understanding
+          | Data dictionary, suitability review, leakage notes
+          v
+02_EDA
+          | Booking, stay, customer, commercial and distribution insights
+          v
+03_Data_Preprocessing
+          | Cleaning, missing value handling, type correction, validation
+          v
+04_Feature_Engineering
+          | Engineered predictors, feature selection, leakage removal
+          v
+05_ML_Data_Preparation
+          | Shared train/test split, preprocessing pipeline, final validation
+          v
+06_Model_Evaluation
+          | Model comparison, tuning, final model selection
+          v
+backend/app.py
+          | /api/health  /api/schema  /api/dashboard  /api/predict
+          v
+frontend/index.html
+          | Dashboard, prediction form, trends, recommendations
 ```
 
-The backend serves both the API and the frontend dashboard.
+---
 
-### Dashboard Features
-
-- Dashboard KPIs for total bookings, cancellation rate, completed/cancelled bookings and average booking behaviour.
-- Visual cancellation insights by hotel type, customer type, arrival month, market segment, deposit type, lead time and country.
-- Two-step booking prediction form:
-  - Step 1: Reservation, stay and guest details
-  - Step 2: Booking details, history and price
-- Live cancellation prediction result with probability and staff-friendly follow-up advice.
-- Recommendations page with priority actions and daily workflow guidance.
-- System Details page for model and dataset summary.
-
-### Backend API
+<h2 align="center">Backend API</h2>
 
 | Method | Endpoint | Purpose |
 |---|---|---|
 | `GET` | `/api/health` | Confirms the service and model are available |
 | `GET` | `/api/schema` | Returns predictor columns, dropdown options and validation ranges |
-| `GET` | `/api/dashboard` | Returns KPI, chart, recommendation and model-summary data |
+| `GET` | `/api/dashboard` | Returns KPI, chart, recommendation and model insight data |
+| `GET` | `/api/test` | Opens the API test console |
 | `POST` | `/api/predict` | Accepts booking details and returns cancellation prediction |
 
-Prediction response includes predicted class, staff-friendly label, cancellation probability, model name/version and final feature values used by the model.
+Prediction responses include predicted class, staff-friendly prediction label, cancellation probability, model name/version and final feature values used by the model.
 
-## Quick Start
+Invalid or missing inputs return a clear `400` response with field-level error messages.
+
+---
+
+<h2 align="center">Frontend Experience</h2>
+
+| Section | Purpose |
+|---|---|
+| Dashboard | Shows total bookings, cancellation rate, average lead time, room rate and other KPIs |
+| Check a Booking | Two-step form for entering reservation details and generating a prediction |
+| Booking Trends | Shows cancellation patterns by channel, deposit type, country, lead time and model importance |
+| Recommendations | Gives simple operational actions for reducing avoidable cancellations |
+
+The API test console is available at:
+
+```text
+http://127.0.0.1:8001/api/test
+```
+
+---
+
+<h2 align="center">Quick Start</h2>
 
 Run all commands from the repository root.
 
-Install dependencies:
+### 1. Install dependencies
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-Start the backend and dashboard:
+### 2. Start the backend and dashboard
 
 ```powershell
 .\.venv\Scripts\python.exe backend\app.py 8001
 ```
 
-Open the dashboard:
+### 3. Open the application
 
 ```text
 http://127.0.0.1:8001
@@ -130,80 +268,49 @@ If an older version appears in the browser, hard refresh:
 Ctrl + F5
 ```
 
-## Repository Structure
+---
 
-```text
-IT3051-FDM-Mini-Project-2026/
-|-- 01_Dataset_Understanding/
-|-- 02_EDA/
-|   `-- Figures/
-|-- 03_Data_Preprocessing/
-|-- 04_Feature_Engineering/
-|-- 05_ML_Data_Preparation/
-|-- 06_Model_Evaluation/
-|   |-- Figures/
-|   `-- Models/
-|       |-- tuned_random_forest_pipeline.joblib
-|       `-- tuned_random_forest_metadata.json
-|-- backend/
-|   `-- app.py
-|-- frontend/
-|   |-- assets/
-|   |-- index.html
-|   |-- app.js
-|   `-- styles.css
-|-- data/
-|   |-- raw/
-|   `-- processed/
-|-- scripts/
-|-- tests/
-|-- requirements.txt
-`-- README.md
+<h2 align="center">Running Tests</h2>
+
+Run the automated test suite:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-## Workflow Deliverables
+Current test coverage includes data-cleaning validation, preprocessing safety, predictor preparation, final-model inference, input validation and backend API endpoints.
+
+Latest checked result:
+
+```text
+Ran 12 tests
+OK
+```
+
+---
+
+<h2 align="center">Workflow Deliverables</h2>
 
 ### 1. Dataset Understanding
-
-Notebook:
 
 ```text
 01_Dataset_Understanding/Dataset_Selection_and_Understanding.ipynb
 ```
 
-Covers problem definition, dataset source, structure, target explanation, data dictionary, missing values, duplicates, invalid values, unusual observations, class distribution, leakage review and suitability conclusion.
+Includes problem definition, dataset source, target explanation, data dictionary, missing values, duplicates, invalid values, unusual observations, class distribution, leakage review and suitability conclusion.
 
 ### 2. Exploratory Data Analysis
-
-Notebook:
 
 ```text
 02_EDA/EDA.ipynb
 ```
 
-EDA areas:
-
-- Booking and customer behaviour
-- Stay and reservation patterns
-- Commercial and distribution patterns
-
-Generated figures are stored under:
-
-```text
-02_EDA/Figures/
-```
+EDA covers booking behaviour, stay patterns, customer behaviour, commercial patterns and distribution channels. Generated figures are stored in `02_EDA/Figures/`.
 
 ### 3. Data Preprocessing
 
-Notebook:
-
 ```text
 03_Data_Preprocessing/Data_Preprocessing.ipynb
-```
-
-Script:
-
-```text
 scripts/clean_hotel_bookings.py
 ```
 
@@ -217,8 +324,6 @@ Main cleaning decisions:
 - Retained valid extreme values where there was no strong evidence of error.
 
 ### 4. Feature Engineering and Selection
-
-Notebook:
 
 ```text
 04_Feature_Engineering/Feature_Engineering_and_Selection.ipynb
@@ -243,8 +348,6 @@ Feature-selection decisions:
 
 ### 5. ML Data Preparation
 
-Notebook:
-
 ```text
 05_ML_Data_Preparation/ML_Data_Preparation_and_Final_Validation.ipynb
 ```
@@ -262,8 +365,6 @@ Transformed features: 116
 Validation confirmed no overlapping train/test rows, no non-finite transformed values and no excluded leakage fields among predictors.
 
 ### 6. Model Evaluation
-
-Notebooks:
 
 ```text
 06_Model_Evaluation/Shared_Model_Setup.ipynb
@@ -296,6 +397,7 @@ Frontend:
 frontend/index.html
 frontend/app.js
 frontend/styles.css
+frontend/api-test.html
 ```
 
 Stage 9 backend requirements covered:
@@ -314,54 +416,64 @@ Stage 10 frontend requirements covered:
 - Uses a two-step form for better usability.
 - Validates user inputs.
 - Presents prediction results and probabilities clearly.
-- Provides dashboard visualizations and recommendations.
+- Follows the hotel booking cancellation scenario.
+- Provides a simple and understandable user experience.
 - Works end to end with the backend API.
 
-## Regenerating Project Outputs
+---
 
-Regenerate dataset-understanding outputs:
+<h2 align="center">Repository Structure</h2>
+
+```text
+IT3051-FDM-Mini-Project-2026/
+|-- 01_Dataset_Understanding/
+|-- 02_EDA/
+|   `-- Figures/
+|-- 03_Data_Preprocessing/
+|-- 04_Feature_Engineering/
+|-- 05_ML_Data_Preparation/
+|-- 06_Model_Evaluation/
+|   |-- Figures/
+|   `-- Models/
+|       |-- tuned_random_forest_pipeline.joblib
+|       `-- tuned_random_forest_metadata.json
+|-- backend/
+|   `-- app.py
+|-- frontend/
+|   |-- assets/
+|   |   `-- luxury-hotel-logo.svg
+|   |-- api-test.html
+|   |-- index.html
+|   |-- app.js
+|   `-- styles.css
+|-- data/
+|   |-- raw/
+|   `-- processed/
+|-- scripts/
+|-- tests/
+|   |-- test_backend_service.py
+|   |-- test_data_cleaning.py
+|   `-- test_preprocessing.py
+|-- requirements.txt
+`-- README.md
+```
+
+---
+
+<h2 align="center">Regenerating Project Outputs</h2>
 
 ```powershell
 python scripts/generate_dataset_understanding.py
-```
-
-Regenerate EDA notebook and figures:
-
-```powershell
 python scripts/generate_eda.py
-```
-
-Regenerate preprocessing outputs:
-
-```powershell
 python scripts/generate_preprocessing.py
-```
-
-Regenerate feature-engineering outputs:
-
-```powershell
 python scripts/generate_feature_engineering.py
-```
-
-Regenerate model-evaluation notebooks:
-
-```powershell
 python scripts/generate_model_evaluation.py
-```
-
-Regenerate and execute model notebooks:
-
-```powershell
 python scripts/generate_model_evaluation.py --execute
 ```
 
-Run regression checks:
+---
 
-```powershell
-python -m unittest discover -s tests -v
-```
-
-## Team Workflow Notes
+<h2 align="center">Team Workflow Notes</h2>
 
 - Keep file paths relative to the project root.
 - Do not commit machine-specific absolute paths in notebooks or scripts.
@@ -370,6 +482,16 @@ python -m unittest discover -s tests -v
 - Re-run notebooks before final submission so outputs match the latest scripts.
 - Avoid notebook outputs that expose personal laptop paths.
 
-## Environment Note
+---
+
+<h2 align="center">Environment Note</h2>
 
 The saved model metadata records scikit-learn `1.9.0`. `requirements.txt` is aligned to that version to avoid model persistence warnings when loading the saved pipeline.
+
+<div align="center">
+
+## Hotel Booking Cancellation Prediction System
+
+End-to-end data mining, machine learning, backend and frontend system for hotel booking cancellation risk prediction.
+
+</div>
