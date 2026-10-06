@@ -305,12 +305,19 @@ function showPrediction(data) {
 function setupNavigation() {
   document.querySelectorAll(".nav-link").forEach((button) => {
     button.addEventListener("click", () => {
-      document.querySelectorAll(".nav-link").forEach((item) => item.classList.remove("active"));
-      document.querySelectorAll(".section").forEach((section) => section.classList.remove("active"));
-      button.classList.add("active");
-      document.querySelector(`#section-${button.dataset.section}`).classList.add("active");
+      activateSection(button.dataset.section);
     });
   });
+}
+
+function activateSection(sectionName) {
+  const button = document.querySelector(`.nav-link[data-section="${sectionName}"]`);
+  const section = document.querySelector(`#section-${sectionName}`);
+  if (!button || !section) return;
+  document.querySelectorAll(".nav-link").forEach((item) => item.classList.remove("active"));
+  document.querySelectorAll(".section").forEach((item) => item.classList.remove("active"));
+  button.classList.add("active");
+  section.classList.add("active");
 }
 
 form.addEventListener("submit", async (event) => {
@@ -353,6 +360,7 @@ form.addEventListener("reset", () => {
 
 async function init() {
   setupNavigation();
+  activateSection(new URLSearchParams(window.location.search).get("section") || "overview");
   updateStep();
   let health;
   try {
