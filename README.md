@@ -176,34 +176,9 @@ The saved pipeline includes both preprocessing and the trained model, so backend
 
 <h2 align="center">System Architecture</h2>
 
-```text
-Hotel Booking Dataset
-          |
-          v
-01_Dataset_Understanding
-          | Data dictionary, suitability review, leakage notes
-          v
-02_EDA
-          | Booking, stay, customer, commercial and distribution insights
-          v
-03_Data_Preprocessing
-          | Cleaning, missing value handling, type correction, validation
-          v
-04_Feature_Engineering
-          | Engineered predictors, feature selection, leakage removal
-          v
-05_ML_Data_Preparation
-          | Shared train/test split, preprocessing pipeline, final validation
-          v
-06_Model_Evaluation
-          | Model comparison, tuning, final model selection
-          v
-backend/app.py
-          | /api/health  /api/schema  /api/dashboard  /api/predict
-          v
-frontend/index.html
-          | Dashboard, prediction form, trends, recommendations
-```
+<p align="center">
+  <img src="docs/system-architecture.jpeg" alt="Hotel Booking Cancellation Prediction System architecture" width="850" />
+</p>
 
 ---
 
@@ -231,6 +206,30 @@ Invalid or missing inputs return a clear `400` response with field-level error m
 | Check a Booking | Two-step form for entering reservation details and generating a prediction |
 | Booking Trends | Shows cancellation patterns by channel, deposit type, country, lead time and model importance |
 | Recommendations | Gives simple operational actions for reducing avoidable cancellations |
+
+### Dashboard Overview
+
+<p align="center">
+  <img src="docs/frontend-dashboard.png" alt="Hotel booking dashboard overview" width="900" />
+</p>
+
+### Booking Prediction Form
+
+<p align="center">
+  <img src="docs/frontend-prediction.png" alt="Hotel booking prediction form" width="900" />
+</p>
+
+### Booking Trends
+
+<p align="center">
+  <img src="docs/frontend-trends.png" alt="Hotel booking trend visualizations" width="900" />
+</p>
+
+### Recommendations
+
+<p align="center">
+  <img src="docs/frontend-recommendations.png" alt="Hotel booking recommendation dashboard" width="900" />
+</p>
 
 The API test console is available at:
 
@@ -449,6 +448,12 @@ IT3051-FDM-Mini-Project-2026/
 |-- data/
 |   |-- raw/
 |   `-- processed/
+|-- docs/
+|   |-- system-architecture.jpeg
+|   |-- frontend-dashboard.png
+|   |-- frontend-prediction.png
+|   |-- frontend-trends.png
+|   `-- frontend-recommendations.png
 |-- scripts/
 |-- tests/
 |   |-- test_backend_service.py
@@ -457,30 +462,6 @@ IT3051-FDM-Mini-Project-2026/
 |-- requirements.txt
 `-- README.md
 ```
-
----
-
-<h2 align="center">Regenerating Project Outputs</h2>
-
-```powershell
-python scripts/generate_dataset_understanding.py
-python scripts/generate_eda.py
-python scripts/generate_preprocessing.py
-python scripts/generate_feature_engineering.py
-python scripts/generate_model_evaluation.py
-python scripts/generate_model_evaluation.py --execute
-```
-
----
-
-<h2 align="center">Team Workflow Notes</h2>
-
-- Keep file paths relative to the project root.
-- Do not commit machine-specific absolute paths in notebooks or scripts.
-- Keep raw data unchanged in `data/raw/`.
-- Save processed outputs in `data/processed/`.
-- Re-run notebooks before final submission so outputs match the latest scripts.
-- Avoid notebook outputs that expose personal laptop paths.
 
 ---
 
